@@ -9,13 +9,21 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
   const allowedOrigins = [
     'http://localhost:5173',
     'https://nexora-ai.org',
-    'https://www.nexora-ai.org'
-  ];
+    'https://www.nexora-ai.org',
+    process.env.CLIENT_URL,
+  ].filter(Boolean) as string[];
+
+  const isAllowedOrigin = (origin: string | undefined): boolean => {
+    if (!origin) return true;
+    if (allowedOrigins.includes(origin)) return true;
+    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return true;
+    return false;
+  };
 
   const io = new Server(httpServer, {
     cors: {
       origin: (origin, callback) => {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (isAllowedOrigin(origin)) {
           callback(null, true);
         } else {
           callback(new Error('Not allowed by CORS'));

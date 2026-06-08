@@ -26,12 +26,21 @@ app.use('/api/', rateLimit({
 const allowedOrigins = [
   'http://localhost:5173', // For local development
   'https://nexora-ai.org',  // Our official production domain
-  'https://www.nexora-ai.org'
-];
+  'https://www.nexora-ai.org',
+  process.env.CLIENT_URL,  // Dynamic: set in Render env vars
+].filter(Boolean) as string[];
+
+// Also allow Vercel preview deployments (*.vercel.app)
+const isAllowedOrigin = (origin: string | undefined): boolean => {
+  if (!origin) return true; // Allow server-to-server
+  if (allowedOrigins.includes(origin)) return true;
+  if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
