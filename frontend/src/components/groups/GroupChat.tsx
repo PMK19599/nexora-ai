@@ -26,7 +26,7 @@ export default function GroupChat({ groupId }: { groupId: string }) {
     const tokenMatch = document.cookie.match(/token=([^;]+)/);
     const token = tokenMatch ? tokenMatch[1] : '';
 
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000', {
       auth: { token },
       withCredentials: true,
       transports: ['websocket', 'polling'] // websocket first
