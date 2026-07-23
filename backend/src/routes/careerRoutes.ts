@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { uploadSyllabus, analyze, generateRoadmap, getGapAnalysis, getIndustryInsights, getCareerPaths, getRoadmaps, importRoadmap, getSharedRoadmaps, shareRoadmap } from '../controllers/careerController';
+import { uploadSyllabus, analyze, generateRoadmap, getGapAnalysis, getIndustryInsights, getCareerPaths, getRoadmaps, importRoadmap, getSharedRoadmaps, shareRoadmap, deleteCareerPath } from '../controllers/careerController';
 import { protect } from '../middleware/auth';
 import { upload } from '../middleware/upload';
 
@@ -10,6 +10,7 @@ r.post('/generate-roadmap', protect, generateRoadmap);
 r.get('/gap-analysis', protect, getGapAnalysis);
 r.get('/industry-insights', protect, getIndustryInsights);
 r.get('/paths', protect, getCareerPaths);
+r.delete('/paths/:id', protect, deleteCareerPath);
 r.get('/roadmaps', protect, getRoadmaps);
 r.post('/import-roadmap', protect, importRoadmap);
 r.get('/shared-roadmaps', protect, getSharedRoadmaps);

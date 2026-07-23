@@ -13,7 +13,7 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
   let message = err.message || 'Something went wrong. Please try again.';
 
   // Log every error in dev
-  if (process.env.NODE_ENV !== 'production') {
+  if (!['production', 'test'].includes(process.env.NODE_ENV || '')) {
     console.error(`\n❌ [${statusCode}] ${err.message}`);
   }
 
@@ -24,6 +24,9 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
     statusCode = 503;
     message = 'Cannot connect to database. Please wait a moment and try again.';
   }
+
+  if (err.code === 'LIMIT_FILE_SIZE') { statusCode = 413; message = 'File is too large. Maximum size is 10 MB.'; }
+  if (String(err.message || '').startsWith('File type not supported')) { statusCode = 400; message = err.message; }
 
   // Mongoose duplicate key (e.g. email already exists)
   if (err.code === 11000) {

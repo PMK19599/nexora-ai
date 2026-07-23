@@ -10,7 +10,7 @@ afterAll(async () => { await mongoose.disconnect(); await mongoServer.stop(); })
 beforeEach(async () => { await User.deleteMany({}); });
 
 describe('Auth API', () => {
-  const user = { name: 'Test', email: 'test@example.com', password: 'password123' };
+  const user = { name: 'Test', email: 'test@example.invalid', password: crypto.randomBytes(18).toString('base64url') + 'Aa1!' };
 
   it('registers a user', async () => {
     const res = await request(app).post('/api/auth/register').send(user);

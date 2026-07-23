@@ -10,6 +10,7 @@ import hpp from 'hpp';
 import mongoose from 'mongoose';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
+import { csrfProtection } from './middleware/csrf';
 
 const app = express();
 
@@ -23,17 +24,38 @@ app.use('/api/', rateLimit({
   message: { success: false, message: 'Too many requests, please try again later.' },
 }));
 
-// CORS — permissive in dev
+const allowedOrigins = [
+  'http://localhost:5173', // For local development
+  'https://nexora-ai.org',  // Our official production domain
+  'https://www.nexora-ai.org',
+  process.env.CLIENT_URL,  // Dynamic: set in Render env vars
+].filter(Boolean) as string[];
+
+// Also allow Vercel preview deployments (*.vercel.app)
+const isAllowedOrigin = (origin: string | undefined): boolean => {
+  if (!origin) return true; // Allow server-to-server
+  if (allowedOrigins.includes(origin)) return true;
+  if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
+
 app.use(cors({
-  origin: (_origin, cb) => cb(null, true),
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
 }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use('/api', csrfProtection);
 app.use(compression());
 
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));

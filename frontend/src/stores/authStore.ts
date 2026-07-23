@@ -1,12 +1,10 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { User, Notification } from '../types';
-import { authAPI } from '../services/api';
+import { authAPI, setCsrfToken } from '../services/api';
 import { connectSocket, disconnectSocket } from '../services/socket';
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   notifications: Notification[];
@@ -33,18 +31,17 @@ function extractError(e: any, fallback: string): string {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
     (set, get) => ({
-      user: null, token: null, isAuthenticated: false, isLoading: false,
+      user: null, isAuthenticated: false, isLoading: false,
       notifications: [], unreadCount: 0,
 
       login: async (email, password) => {
         set({ isLoading: true });
         try {
           const { data } = await authAPI.login({ email, password });
-          localStorage.setItem('token', data.token);
-          try { connectSocket(data.token); } catch {}
-          set({ user: data.user, token: data.token, isAuthenticated: true, isLoading: false });
+          setCsrfToken(data.csrfToken);
+          try { connectSocket(); } catch {}
+          set({ user: data.user, isAuthenticated: true, isLoading: false });
         } catch (e: any) {
           set({ isLoading: false });
           throw new Error(extractError(e, 'Login failed. Check your email and password.'));
@@ -55,9 +52,9 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const { data } = await authAPI.register(userData);
-          localStorage.setItem('token', data.token);
-          try { connectSocket(data.token); } catch {}
-          set({ user: data.user, token: data.token, isAuthenticated: true, isLoading: false });
+          setCsrfToken(data.csrfToken);
+          try { connectSocket(); } catch {}
+          set({ user: data.user, isAuthenticated: true, isLoading: false });
         } catch (e: any) {
           set({ isLoading: false });
           throw new Error(extractError(e, 'Registration failed. Please try again.'));
@@ -66,22 +63,20 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try { await authAPI.logout(); } catch {}
-        localStorage.removeItem('token');
+        setCsrfToken();
         try { disconnectSocket(); } catch {}
-        set({ user: null, token: null, isAuthenticated: false, notifications: [], unreadCount: 0 });
+        set({ user: null, isAuthenticated: false, notifications: [], unreadCount: 0 });
       },
 
       loadUser: async () => {
-        const token = localStorage.getItem('token');
-        if (!token) { set({ isAuthenticated: false, isLoading: false }); return; }
         set({ isLoading: true });
         try {
           const { data } = await authAPI.getMe();
-          try { connectSocket(token); } catch {}
-          set({ user: data.user, token, isAuthenticated: true, isLoading: false });
+          setCsrfToken(data.csrfToken);
+          try { connectSocket(); } catch {}
+          set({ user: data.user, isAuthenticated: true, isLoading: false });
         } catch {
-          localStorage.removeItem('token');
-          set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+          set({ user: null, isAuthenticated: false, isLoading: false });
         }
       },
 
@@ -110,7 +105,5 @@ export const useAuthStore = create<AuthState>()(
         const { data } = await authAPI.unlockReward(rewardId, xpCost);
         set({ user: data.user });
       },
-    }),
-    { name: 'nexora-auth', partialize: (s) => ({ token: s.token }) }
-  )
+    })
 );

@@ -6,15 +6,42 @@ import { User, PeerSession, Notification } from '../models';
 const onlineUsers = new Map<string, { userId: string; socketId: string; name: string }>();
 
 export const initializeSocket = (httpServer: HttpServer): Server => {
-  const io = new Server(httpServer, { cors: { origin: process.env.CLIENT_URL || 'http://localhost:5173', methods: ['GET','POST'], credentials: true } });
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://nexora-ai.org',
+    'https://www.nexora-ai.org',
+    process.env.CLIENT_URL,
+  ].filter(Boolean) as string[];
+
+  const isAllowedOrigin = (origin: string | undefined): boolean => {
+    if (!origin) return true;
+    if (allowedOrigins.includes(origin)) return true;
+    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return true;
+    return false;
+  };
+
+  const io = new Server(httpServer, {
+    cors: {
+      origin: (origin, callback) => {
+        if (isAllowedOrigin(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      methods: ['GET', 'POST'],
+      credentials: true
+    }
+  });
 
   io.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization?.split(' ')[1];
+      const cookie = socket.handshake.headers.cookie || '';
+      const token = cookie.split(';').map(v => v.trim()).find(v => v.startsWith('nexora_session='))?.slice('nexora_session='.length);
       if (!token) return next(new Error('Auth required'));
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'neurolearn-jwt-secret-dev-2026') as { id: string };
-      const user = await User.findById(decoded.id);
-      if (!user) return next(new Error('User not found'));
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'development-only-change-me') as { id: string; version: number };
+      const user = await User.findById(decoded.id).select('+tokenVersion');
+      if (!user || (user.tokenVersion || 0) !== (decoded.version || 0)) return next(new Error('Session revoked'));
       (socket as any).userId = user._id.toString();
       (socket as any).userName = user.name;
       next();

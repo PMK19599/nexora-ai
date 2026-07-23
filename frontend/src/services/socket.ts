@@ -1,15 +1,14 @@
 import { io, Socket } from 'socket.io-client';
-
-const URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+import { SOCKET_URL } from '@/config/runtime';
 
 let socket: Socket | null = null;
 
-export const connectSocket = (token: string): Socket | null => {
+export const connectSocket = (): Socket | null => {
   try {
     if (socket?.connected) return socket;
 
-    socket = io(URL, {
-      auth: { token },
+    socket = io(SOCKET_URL, {
+      withCredentials: true,
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 2000,
@@ -17,9 +16,7 @@ export const connectSocket = (token: string): Socket | null => {
       timeout: 5000,
     });
 
-    socket.on('connect', () => {
-      console.log('🔌 Socket connected');
-    });
+    socket.on('connect', () => undefined);
 
     socket.on('connect_error', (err) => {
       // Silent fail — sockets are optional

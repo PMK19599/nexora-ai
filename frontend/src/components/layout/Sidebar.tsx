@@ -2,21 +2,14 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/lib/utils';
+import { navigationItems, adminNavigationItem } from '@/config/navigation';
 
-const items = [
-  { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { path: '/review', label: 'Spaced Review', icon: '🧠' },
-  { path: '/games', label: 'Learn & Play', icon: '🎮' },
-  { path: '/career', label: 'Career Path', icon: '🚀' },
-  { path: '/tutors', label: 'Peer Tutors', icon: '👥' },
-  { path: '/groups', label: 'Study Groups', icon: '📚' },
-  { path: '/accessibility', label: 'Accessibility', icon: '♿' },
-];
+const items = navigationItems;
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuthStore();
-  const all = user?.role === 'admin' ? [...items, { path: '/admin', label: 'Admin Panel', icon: '⚙️' }] : items;
+  const all = user?.role === 'admin' ? [...items, adminNavigationItem] : items;
 
   return (
     <nav className={cn('hidden md:flex flex-col bg-card border-r transition-all duration-300 shadow-sm', collapsed ? 'w-[72px]' : 'w-[260px]')} aria-label="Main navigation">

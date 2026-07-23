@@ -126,9 +126,11 @@ export const uploadAndAnalyzeSyllabus = async (userId: string, filePath: string,
 
   // Upload to Cloudinary for reference storage
   let pdfUrl = '';
+  let pdfPublicId = '';
   try {
     const uploadRes = await uploadToCloudinary(filePath, 'nexora_syllabi');
     pdfUrl = uploadRes.url;
+    pdfPublicId = uploadRes.publicId;
   } catch (err) {
     console.warn('Failed to upload syllabus PDF to Cloudinary:', err);
   }
@@ -180,13 +182,14 @@ ${ndPrompt}`,
     company,
     parsedSyllabus: { concepts, chapters: concepts.slice(0, 10), prerequisites: [], domain: dreamJob },
     pdfUrl,
+    pdfPublicId,
     syllabusChunks,
     ...result
   });
 };
 
 export const getGapAnalysis = async (userId: string, careerPathId: string) => {
-  const cp = await CareerPath.findById(careerPathId);
+  const cp = await CareerPath.findOne({ _id: careerPathId, userId });
   const user = await User.findById(userId);
   if (!cp || !user) throw new Error('Career path not found');
   const userSkills = (user.skills || []).map(s => s.toLowerCase());

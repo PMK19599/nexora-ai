@@ -31,6 +31,14 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: UserRole;
+  isEmailVerified: boolean;
+  onboardingComplete: boolean;
+  tokenVersion: number;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  verificationSentAt?: Date;
   avatar?: string;
   learningTrack: LearningTrack;
   neurodivergentType: NeurodivergentType;
@@ -112,6 +120,7 @@ export interface ICareerPath extends Document {
   interviewTopics: string[];
   techStack: string[];
   pdfUrl?: string;
+  pdfPublicId?: string;
   syllabusChunks?: { text: string; embedding: number[] }[];
 }
 

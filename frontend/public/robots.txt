@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /review
+Disallow: /games
+Disallow: /career
+Disallow: /tutors
+Disallow: /groups
+Disallow: /accessibility
+Disallow: /admin
+

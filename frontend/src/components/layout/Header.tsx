@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useAccessibilityStore } from '@/stores/accessibilityStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { navigationItems } from '@/config/navigation';
 export default function Header() {
   const { user, logout, notifications, unreadCount, fetchNotifications } = useAuthStore();
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function Header() {
         </div>
         <Button variant="ghost" size="sm" onClick={async () => { await logout(); navigate('/login'); }}><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg><span className="hidden sm:inline ml-1">Logout</span></Button>
       </div>
-      {showMobile && <div className="fixed inset-0 z-50 md:hidden"><div className="absolute inset-0 bg-black/50" onClick={() => setShowMobile(false)} /><nav className="absolute left-0 top-0 h-full w-64 bg-card p-4 shadow-lg"><div className="mb-6 flex items-center gap-2"><span className="text-2xl">✦</span><span className="text-lg font-bold text-primary">Nexora AI</span></div><ul className="space-y-1">{[{p:'/dashboard',l:'Dashboard',i:'📊'},{p:'/review',l:'Review',i:'🧠'},{p:'/games',l:'Learn & Play',i:'🎮'},{p:'/career',l:'Career',i:'🚀'},{p:'/tutors',l:'Tutors',i:'👥'},{p:'/groups',l:'Groups',i:'📚'},{p:'/accessibility',l:'Access.',i:'♿'}].map(x=><li key={x.p}><NavLink to={x.p} onClick={()=>setShowMobile(false)} className={({isActive})=>`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium ${isActive?'bg-primary text-primary-foreground':'hover:bg-accent'}`}><span>{x.i}</span><span>{x.l}</span></NavLink></li>)}</ul></nav></div>}
+      {showMobile && <div className="fixed inset-0 z-50 md:hidden"><div className="absolute inset-0 bg-black/50" onClick={() => setShowMobile(false)} /><nav className="absolute left-0 top-0 h-full w-64 bg-card p-4 shadow-lg"><div className="mb-6 flex items-center gap-2"><span className="text-2xl">✦</span><span className="text-lg font-bold text-primary">Nexora AI</span></div><ul className="space-y-1">{navigationItems.map(x=><li key={x.path}><NavLink to={x.path} onClick={()=>setShowMobile(false)} className={({isActive})=>`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium ${isActive?'bg-primary text-primary-foreground':'hover:bg-accent'}`}><span>{x.icon}</span><span>{x.label}</span></NavLink></li>)}</ul></nav></div>}
     </header>
   );
 }

@@ -1,10 +1,14 @@
 import { Router } from 'express';
-import { register, login, logout, getMe, updateProfile, getNotifications, markNotificationRead, unlockReward } from '../controllers/authController';
+import { register, login, logout, getMe, updateProfile, getNotifications, markNotificationRead, unlockReward, forgotPassword, resetPassword, verifyEmail, resendVerification } from '../controllers/authController';
 import { protect } from '../middleware/auth';
 import { validate, registerSchema, loginSchema } from '../middleware/validation';
 const r = Router();
 r.post('/register', validate(registerSchema), register);
 r.post('/login', validate(loginSchema), login);
+r.post('/forgot-password', forgotPassword);
+r.post('/reset-password', resetPassword);
+r.post('/verify-email', verifyEmail);
+r.post('/resend-verification', resendVerification);
 r.post('/logout', protect, logout);
 r.get('/me', protect, getMe);
 r.put('/profile', protect, updateProfile);

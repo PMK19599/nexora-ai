@@ -1,6 +1,8 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
+import { API_URL } from '@/config/runtime';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+let csrfToken = '';
+export const setCsrfToken = (token?: string) => { csrfToken = token || ''; };
 
 const api = axios.create({
   baseURL: API_URL,
@@ -10,8 +12,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((c) => {
-  const t = localStorage.getItem('token');
-  if (t) c.headers.Authorization = `Bearer ${t}`;
+  const method = c.method?.toLowerCase();
+  if (method && !['get', 'head', 'options'].includes(method)) {
+    if (csrfToken) c.headers['X-CSRF-Token'] = csrfToken;
+  }
   return c;
 });
 
@@ -20,12 +24,11 @@ api.interceptors.response.use(
   (error) => {
     if (!error.response) {
       error.response = {
-        data: { success: false, message: error.code === 'ERR_NETWORK' ? 'Cannot reach the server. Is the backend running on port 5000?' : `Network error: ${error.message}` },
+        data: { success: false, message: error.code === 'ERR_NETWORK' ? 'Cannot reach Nexora right now. Check your connection and try again.' : `Network error: ${error.message}` },
         status: 0,
       };
     }
     if (error.response.status === 401 && !['/login', '/register', '/'].includes(window.location.pathname)) {
-      localStorage.removeItem('token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -41,6 +44,10 @@ export const authAPI = {
   getNotifications: () => api.get('/auth/notifications'),
   markNotificationRead: (id: string) => api.put(`/auth/notifications/${id}/read`),
   unlockReward: (rewardId: string, xpCost: number) => api.post('/auth/unlock-reward', { rewardId, xpCost }),
+  forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token: string, password: string) => api.post('/auth/reset-password', { token, password }),
+  verifyEmail: (token: string) => api.post('/auth/verify-email', { token }),
+  resendVerification: (email: string) => api.post('/auth/resend-verification', { email }),
 };
 
 export const reviewAPI = {
@@ -51,12 +58,13 @@ export const reviewAPI = {
 };
 
 export const careerAPI = {
-  uploadSyllabus: (d: FormData) => api.post('/career/upload-syllabus', d, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 120000 }),
+  uploadSyllabus: (d: FormData, config: AxiosRequestConfig = {}) => api.post('/career/upload-syllabus', d, { ...config, headers: { 'Content-Type': 'multipart/form-data', ...config.headers }, timeout: 120000 }),
   analyze: (d: any) => api.post('/career/analyze', d, { timeout: 120000 }),
   generateRoadmap: (d: any) => api.post('/career/generate-roadmap', d, { timeout: 120000 }),
   getGapAnalysis: (id: string) => api.get(`/career/gap-analysis?careerPathId=${id}`, { timeout: 60000 }),
   getIndustryInsights: (j: string, c: string) => api.get(`/career/industry-insights?dreamJob=${encodeURIComponent(j)}&company=${encodeURIComponent(c)}`, { timeout: 60000 }),
   getPaths: () => api.get('/career/paths'),
+  deletePath: (id: string) => api.delete(`/career/paths/${id}`),
   getRoadmaps: () => api.get('/career/roadmaps'),
   importRoadmap: (roadmapId: string) => api.post('/career/import-roadmap', { roadmapId }),
   getSharedRoadmaps: () => api.get('/career/shared-roadmaps'),
@@ -83,10 +91,11 @@ export const groupAPI = {
 };
 
 export const gameAPI = {
-  createFromPDF: (d: FormData) => api.post('/games/from-pdf', d, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 60000 }),
+  createFromPDF: (d: FormData, config: AxiosRequestConfig = {}) => api.post('/games/from-pdf', d, { ...config, headers: { 'Content-Type': 'multipart/form-data', ...config.headers }, timeout: 60000 }),
   createFromText: (d: any) => api.post('/games/from-text', d),
   getMyGames: () => api.get('/games/my-games'),
   getGame: (id: string) => api.get(`/games/${id}`),
+  deleteGame: (id: string) => api.delete(`/games/${id}`),
   submit: (d: any) => api.post('/games/submit', d),
   getHistory: () => api.get('/games/history'),
   getLeaderboard: () => api.get('/games/leaderboard'),

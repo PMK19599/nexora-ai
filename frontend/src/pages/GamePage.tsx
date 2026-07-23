@@ -101,6 +101,8 @@ export default function GamePage() {
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
   const [newLevel, setNewLevel] = useState<number>(1);
   const timerRef = useRef<any>(null);
+  const uploadAbort = useRef<AbortController | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Queries
   const { data: myGames } = useQuery({ queryKey: ['myGames'], queryFn: async () => { const { data } = await gameAPI.getMyGames(); return data.data; } });
@@ -110,9 +112,10 @@ export default function GamePage() {
 
   // Mutations
   const createPDF = useMutation({
-    mutationFn: (fd: FormData) => gameAPI.createFromPDF(fd),
+    mutationFn: ({ fd, controller }: { fd: FormData; controller: AbortController }) => gameAPI.createFromPDF(fd, { signal: controller.signal, onUploadProgress: p => setUploadProgress(p.total ? Math.round((p.loaded / p.total) * 100) : 0) }),
     onSuccess: (res) => { toast.success('🎮 Game ready!'); qc.invalidateQueries({ queryKey: ['myGames'] }); startGame(res.data.data); },
-    onError: (e: any) => toast.error(e.response?.data?.message || 'Failed'),
+    onError: (e: any) => toast.error(e.code === 'ERR_CANCELED' ? 'Upload cancelled.' : e.response?.data?.message || 'Upload failed. You can retry.'),
+    onSettled: () => { uploadAbort.current = null; setUploadProgress(0); },
   });
   const createText = useMutation({
     mutationFn: (d: any) => gameAPI.createFromText(d),
@@ -207,10 +210,12 @@ export default function GamePage() {
 
   const handlePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
+    if (f.type !== 'application/pdf' || !f.name.toLowerCase().endsWith('.pdf')) { toast.error('Choose a PDF file.'); e.target.value=''; return; }
+    if (f.size > 10 * 1024 * 1024) { toast.error('PDF must be 10 MB or smaller.'); e.target.value=''; return; }
     const fd = new FormData();
     fd.append('pdf', f); fd.append('title', title || `Quiz: ${f.name}`);
     fd.append('questionCount', questionCount);
-    createPDF.mutate(fd);
+    const controller = new AbortController(); uploadAbort.current = controller; setUploadProgress(0); createPDF.mutate({ fd, controller });
   };
 
   const handleText = () => {
@@ -672,7 +677,7 @@ export default function GamePage() {
                 <div className="border-2 border-dashed border-teal-200 rounded-xl p-6 text-center hover:border-teal-400 transition-colors">
                   <span className="text-4xl block mb-2">📎</span>
                   <p className="text-sm text-muted-foreground mb-3">Click to select a PDF file</p>
-                  <Input type="file" accept=".pdf" onChange={handlePDF} disabled={createPDF.isPending} className="mx-auto max-w-xs" />
+                  <Input type="file" accept="application/pdf,.pdf" onChange={handlePDF} disabled={createPDF.isPending} className="mx-auto max-w-xs" /><p className="mt-2 text-xs text-muted-foreground">PDF only, maximum 10 MB. Files remain private unless explicitly published.</p>{createPDF.isPending && <div className="mt-3 space-y-2"><Progress value={uploadProgress} /><Button type="button" size="sm" variant="outline" onClick={() => uploadAbort.current?.abort()}>Cancel upload</Button></div>}
                 </div>
                 {createPDF.isPending && (
                   <div className="flex items-center justify-center gap-2 text-sm text-teal-600 p-3 bg-teal-50 rounded-xl">
@@ -781,6 +786,7 @@ export default function GamePage() {
                         <Button size="sm" className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600" onClick={async () => {
                           try { const { data } = await gameAPI.getGame(g._id); startGame(data.data); } catch { toast.error('Failed to load'); }
                         }}>▶ Play</Button>
+                        <Button size="sm" variant="destructive" onClick={async () => { if (!window.confirm('Delete this quiz and its saved sessions?')) return; try { await gameAPI.deleteGame(g._id); toast.success('Quiz deleted.'); qc.invalidateQueries({ queryKey: ['myGames'] }); } catch { toast.error('Could not delete quiz.'); } }}>Delete</Button>
                       </div>
                     </CardContent>
                   </Card>

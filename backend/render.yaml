@@ -23,3 +23,11 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false
+      - key: JWT_EXPIRE
+        value: 1h
+      - key: EMAIL_PROVIDER
+        value: resend
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false

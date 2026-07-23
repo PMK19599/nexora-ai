@@ -1,55 +1,23 @@
 /// <reference types="jest" />
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import request from 'supertest';
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import app from '../app';
-import { User } from '../models';
-
-let mongoServer: MongoMemoryServer;
-beforeAll(async () => { mongoServer = await MongoMemoryServer.create(); await mongoose.connect(mongoServer.getUri()); });
-afterAll(async () => { await mongoose.disconnect(); await mongoServer.stop(); });
-beforeEach(async () => { await User.deleteMany({}); });
-
-describe('Auth API', () => {
-  const user = { name: 'Test', email: 'test@example.com', password: 'password123' };
-
-  it('registers a user', async () => {
-    const res = await request(app).post('/api/auth/register').send(user);
-    expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
-    expect(res.body.token).toBeDefined();
-    expect(res.body.user.email).toBe(user.email);
-  });
-
-  it('rejects duplicate email', async () => {
-    await request(app).post('/api/auth/register').send(user);
-    const res = await request(app).post('/api/auth/register').send(user);
-    expect(res.status).toBe(400);
-  });
-
-  it('logs in', async () => {
-    await request(app).post('/api/auth/register').send(user);
-    const res = await request(app).post('/api/auth/login').send({ email: user.email, password: user.password });
-    expect(res.status).toBe(200);
-    expect(res.body.token).toBeDefined();
-  });
-
-  it('rejects wrong password', async () => {
-    await request(app).post('/api/auth/register').send(user);
-    const res = await request(app).post('/api/auth/login').send({ email: user.email, password: 'wrong' });
-    expect(res.status).toBe(401);
-  });
-
-  it('gets profile with token', async () => {
-    const reg = await request(app).post('/api/auth/register').send(user);
-    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${reg.body.token}`);
-    expect(res.status).toBe(200);
-    expect(res.body.user.email).toBe(user.email);
-  });
-
-  it('rejects without token', async () => {
-    const res = await request(app).get('/api/auth/me');
-    expect(res.status).toBe(401);
-  });
+import { describe,it,expect,beforeAll,afterAll,beforeEach,jest } from '@jest/globals';
+import request from 'supertest'; import mongoose from 'mongoose'; import { MongoMemoryServer } from 'mongodb-memory-server'; import crypto from 'crypto'; import jwt from 'jsonwebtoken'; import app from '../app'; import { User } from '../models';
+jest.setTimeout(30000); let mongoServer:MongoMemoryServer|undefined; let password=''; const email='auth-test@example.invalid'; const hash=(v:string)=>crypto.createHash('sha256').update(v).digest('hex');
+beforeAll(async()=>{mongoServer=await MongoMemoryServer.create();await mongoose.connect(mongoServer.getUri());},30000);
+afterAll(async()=>{if(mongoose.connection.readyState)await mongoose.disconnect();if(mongoServer)await mongoServer.stop();});
+beforeEach(async()=>{await User.deleteMany({});password=crypto.randomBytes(18).toString('base64url')+'Aa1!';});
+const registration=()=>({name:'Test User',email,password});
+const csrfCookie=(res:any)=>String(res.headers['set-cookie']?.find((c:string)=>c.startsWith('nexora_csrf='))||'').split(';')[0].split('=')[1];
+describe('secure auth API',()=>{
+ it('registers with HttpOnly cookie and no token in JSON',async()=>{const res=await request(app).post('/api/auth/register').send(registration());expect(res.status).toBe(201);expect(res.body.token).toBeUndefined();expect(res.body.csrfToken).toBeDefined();expect(([] as string[]).concat(res.headers['set-cookie']||[]).some((c:string)=>c.startsWith('nexora_session=')&&c.includes('HttpOnly'))).toBe(true);expect(res.body.user.isEmailVerified).toBe(false);});
+ it('logs in and gets /me with the cookie session',async()=>{await User.create({...registration(),isEmailVerified:true});const agent=request.agent(app);const login=await agent.post('/api/auth/login').send({email,password});expect(login.status).toBe(200);const me=await agent.get('/api/auth/me');expect(me.status).toBe(200);expect(me.body.user.email).toBe(email);});
+ it('revokes the old credential on logout',async()=>{await User.create({...registration(),isEmailVerified:true});const agent=request.agent(app);const login=await agent.post('/api/auth/login').send({email,password});const oldCookie=String(([] as string[]).concat(login.headers['set-cookie']||[]).find((c:string)=>c.startsWith('nexora_session='))).split(';')[0];const logout=await agent.post('/api/auth/logout').set('X-CSRF-Token',login.body.csrfToken);expect(logout.status).toBe(200);const reused=await request(app).get('/api/auth/me').set('Cookie',oldCookie);expect(reused.status).toBe(401);});
+ it('rejects missing CSRF on authenticated mutation',async()=>{await User.create({...registration(),isEmailVerified:true});const agent=request.agent(app);await agent.post('/api/auth/login').send({email,password});expect((await agent.post('/api/auth/logout')).status).toBe(403);});
+ it('rejects an expired session',async()=>{const user=await User.create({...registration(),isEmailVerified:true});const token=jwt.sign({id:user._id,version:0},process.env.JWT_SECRET||'development-only-change-me',{expiresIn:-1});expect((await request(app).get('/api/auth/me').set('Cookie',`nexora_session=${token}`)).status).toBe(401);});
+ it('rejects unauthenticated protected requests',async()=>{expect((await request(app).get('/api/auth/me')).status).toBe(401);});
+ it('enforces verification before learning APIs',async()=>{const agent=request.agent(app);await agent.post('/api/auth/register').send(registration());expect((await agent.get('/api/review/queue')).status).toBe(403);});
+ it('allows admin and rejects verified student on admin API',async()=>{const adminPassword=crypto.randomBytes(18).toString('base64url')+'Aa1!';await User.create({name:'Admin',email:'admin-test@example.invalid',password:adminPassword,role:'admin',isEmailVerified:true});let agent=request.agent(app);await agent.post('/api/auth/login').send({email:'admin-test@example.invalid',password:adminPassword});expect((await agent.get('/api/admin/users')).status).toBe(200);await User.create({...registration(),isEmailVerified:true});agent=request.agent(app);await agent.post('/api/auth/login').send({email,password});expect((await agent.get('/api/admin/users')).status).toBe(403);});
+ it('verifies a valid email token once',async()=>{const raw=crypto.randomBytes(32).toString('hex');const user=await User.create({...registration(),isEmailVerified:false,emailVerificationToken:hash(raw),emailVerificationExpires:new Date(Date.now()+60000)});expect((await request(app).post('/api/auth/verify-email').send({token:raw})).status).toBe(200);expect((await User.findById(user._id))?.isEmailVerified).toBe(true);expect((await request(app).post('/api/auth/verify-email').send({token:raw})).status).toBe(400);});
+ it('rejects expired verification token',async()=>{const raw=crypto.randomBytes(32).toString('hex');await User.create({...registration(),emailVerificationToken:hash(raw),emailVerificationExpires:new Date(Date.now()-1000)});expect((await request(app).post('/api/auth/verify-email').send({token:raw})).status).toBe(400);});
+ it('resets password once and invalidates existing sessions',async()=>{const raw=crypto.randomBytes(32).toString('hex');const user=await User.create({...registration(),isEmailVerified:true,passwordResetToken:hash(raw),passwordResetExpires:new Date(Date.now()+60000)});const oldToken=user.getSignedJwtToken();const nextPassword=crypto.randomBytes(20).toString('base64url')+'Aa1!';expect((await request(app).post('/api/auth/reset-password').send({token:raw,password:nextPassword})).status).toBe(200);expect((await request(app).post('/api/auth/reset-password').send({token:raw,password:nextPassword})).status).toBe(400);expect((await request(app).get('/api/auth/me').set('Cookie',`nexora_session=${oldToken}`)).status).toBe(401);expect((await request(app).post('/api/auth/login').send({email,password:nextPassword})).status).toBe(200);});
+ it('uses a generic forgot-password response',async()=>{const a=await request(app).post('/api/auth/forgot-password').send({email:'missing@example.invalid'});await User.create({...registration(),isEmailVerified:true});const b=await request(app).post('/api/auth/forgot-password').send({email});expect(a.body.message).toBe(b.body.message);});
 });

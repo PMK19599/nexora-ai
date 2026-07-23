@@ -1,125 +1,22 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { useAccessibilityStore } from './stores/accessibilityStore';
 import Layout from './components/layout/Layout';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import ReviewPage from './pages/ReviewPage';
-import CareerPage from './pages/CareerPage';
-import TutorPage from './pages/TutorPage';
-import GroupsPage from './pages/GroupsPage';
-import GamePage from './pages/GamePage';
-import AccessibilityPage from './pages/AccessibilityPage';
-import AdminPage from './pages/AdminPage';
-import LandingPage from './pages/LandingPage';
 
-const ALL_ACCESSIBILITY_CLASSES = [
-  'font-size-large', 'font-size-xlarge',
-  'font-dyslexic', 'font-clean',
-  'line-spacing-wide', 'line-spacing-extra',
-  'focus-mode-active', 'reduced-motion-active', 'high-contrast-active'
-];
+const LandingPage=lazy(()=>import('./pages/LandingPage')); const LoginPage=lazy(()=>import('./pages/LoginPage')); const RegisterPage=lazy(()=>import('./pages/RegisterPage'));
+const DashboardPage=lazy(()=>import('./pages/DashboardPage')); const ReviewPage=lazy(()=>import('./pages/ReviewPage')); const CareerPage=lazy(()=>import('./pages/CareerPage')); const TutorPage=lazy(()=>import('./pages/TutorPage')); const GroupsPage=lazy(()=>import('./pages/GroupsPage')); const GamePage=lazy(()=>import('./pages/GamePage')); const AccessibilityPage=lazy(()=>import('./pages/AccessibilityPage')); const AdminPage=lazy(()=>import('./pages/AdminPage'));
+const OnboardingPage=lazy(()=>import('./pages/OnboardingPage'));
+const ForgotPasswordPage=lazy(()=>import('./pages/ForgotPasswordPage')); const ResetPasswordPage=lazy(()=>import('./pages/ResetPasswordPage')); const VerifyEmailPage=lazy(()=>import('./pages/VerifyEmailPage')); const VerifyPendingPage=lazy(()=>import('./pages/VerifyPendingPage')); const LegalPage=lazy(()=>import('./pages/LegalPage')); const NotFoundPage=lazy(()=>import('./pages/NotFoundPage'));
 
-export const AccessibilityLifecycleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const settings = useAccessibilityStore();
-
-  useEffect(() => {
-    const body = document.body;
-
-    // Direct, surgical cleaning routine
-    ALL_ACCESSIBILITY_CLASSES.forEach(cls => body.classList.remove(cls));
-
-    // Dynamic state application pipeline
-    if (settings.fontSize === 'large') body.classList.add('font-size-large');
-    if (settings.fontSize === 'xlarge') body.classList.add('font-size-xlarge');
-    if (settings.fontFamily === 'opendyslexic') {
-      body.style.fontFamily = 'OpenDyslexic, sans-serif';
-    } else {
-      body.style.fontFamily = ''; // Revert back to Tailwind defaults safely
-    }
-    if (settings.lineSpacing === 'extra') body.classList.add('line-spacing-extra');
-    if (settings.focusMode) body.classList.add('focus-mode-active');
-    if (settings.highContrast) body.classList.add('high-contrast-active');
-
-    // Theme / Color Contrast Application (keep the theme styling working from the original App.tsx)
-    const root = document.documentElement;
-    root.classList.remove('dark', 'high-contrast', 'cyberpunk', 'cosmic');
-    if (settings.colorContrast === 'dark') root.classList.add('dark');
-    if (settings.colorContrast === 'high' || settings.highContrast) root.classList.add('high-contrast');
-    if (settings.colorContrast === 'cyberpunk') root.classList.add('cyberpunk');
-    if (settings.colorContrast === 'cosmic') root.classList.add('cosmic');
-
-    // Also support focus-mode class
-    if (settings.focusMode) {
-      body.classList.add('focus-mode');
-    } else {
-      body.classList.remove('focus-mode');
-    }
-
-    // Return an explicit unmount payload to kill class memory leaks
-    return () => {
-      ALL_ACCESSIBILITY_CLASSES.forEach(cls => body.classList.remove(cls));
-      body.classList.remove('focus-mode');
-      body.style.fontFamily = '';
-      root.classList.remove('dark', 'high-contrast', 'cyberpunk', 'cosmic');
-    };
-  }, [settings]);
-
-  return <>{children}</>;
-};
-
-function Protected({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuthStore();
-  if (isLoading) return <div className="flex h-screen items-center justify-center"><div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>;
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
-}
-
-function AdminOnly({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore();
-  return user?.role === 'admin' ? <>{children}</> : <Navigate to="/dashboard" />;
-}
-
-export default function App() {
-  const { loadUser, user } = useAuthStore();
-  const store = useAccessibilityStore();
-  const { updateSettings } = store;
-
-  useEffect(() => { loadUser(); }, [loadUser]);
-
-  // Sync DB accessibility settings to Zustand store
-  useEffect(() => {
-    if (user?.accessibility) {
-      const keys = Object.keys(user.accessibility) as Array<keyof typeof user.accessibility>;
-      const differs = keys.some(
-        (key) => user.accessibility[key] !== (store as any)[key]
-      );
-      if (differs) {
-        updateSettings(user.accessibility);
-      }
-    }
-  }, [user?.accessibility, store, updateSettings]);
-
-  return (
-    <AccessibilityLifecycleWrapper>
-      <a href="#main-content" className="skip-link">Skip to main content</a>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/*" element={<Protected><Layout><Routes>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/review" element={<ReviewPage />} />
-          <Route path="/career" element={<CareerPage />} />
-          <Route path="/tutors" element={<TutorPage />} />
-          <Route path="/groups" element={<GroupsPage />} />
-          <Route path="/games" element={<GamePage />} />
-          <Route path="/accessibility" element={<AccessibilityPage />} />
-          <Route path="/admin" element={<AdminOnly><AdminPage /></AdminOnly>} />
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes></Layout></Protected>} />
-      </Routes>
-    </AccessibilityLifecycleWrapper>
-  );
-}
+const CLASSES=['font-size-small','font-size-large','font-size-xlarge','font-dyslexic','font-arial','font-verdana','font-vazirmatn','line-spacing-wide','line-spacing-wider','line-spacing-extra','focus-mode','reading-mode','reduced-distractions','predictable-navigation','no-animations','high-contrast-active'];
+export const applyAccessibilityToDocument=(settings:any,body=document.body,root=document.documentElement)=>{CLASSES.forEach(c=>body.classList.remove(c)); if(settings.fontSize!=='normal'&&settings.fontSize!=='medium')body.classList.add('font-size-'+settings.fontSize); if(settings.fontFamily!=='default')body.classList.add('font-'+settings.fontFamily); if(settings.lineSpacing!=='normal')body.classList.add('line-spacing-'+settings.lineSpacing); if(settings.focusMode)body.classList.add('focus-mode'); if(settings.readingMode)body.classList.add('reading-mode'); if(settings.reducedDistractions)body.classList.add('reduced-distractions'); if(settings.predictableNavigation)body.classList.add('predictable-navigation'); if(!settings.animations||settings.reducedMotion)body.classList.add('no-animations'); root.classList.remove('dark','high-contrast','cyberpunk','cosmic'); if(settings.colorContrast==='dark')root.classList.add('dark'); if(settings.colorContrast==='high'||settings.highContrast)root.classList.add('high-contrast'); if(settings.colorContrast==='cyberpunk')root.classList.add('cyberpunk'); if(settings.colorContrast==='cosmic')root.classList.add('cosmic');};
+export const AccessibilityLifecycleWrapper=({children}:{children:React.ReactNode})=>{const settings=useAccessibilityStore();useEffect(()=>{applyAccessibilityToDocument(settings);return()=>CLASSES.forEach(c=>document.body.classList.remove(c));},[settings]);return <>{children}</>};
+const titles:Record<string,string>={'/':'Nexora AI — Accessible AI learning','/login':'Sign in — Nexora AI','/register':'Create account — Nexora AI','/dashboard':'Dashboard — Nexora AI','/review':'Spaced Review — Nexora AI','/games':'Learn & Play — Nexora AI','/career':'Career Path — Nexora AI','/tutors':'Peer Tutors — Nexora AI','/groups':'Study Groups — Nexora AI','/accessibility':'Accessibility — Nexora AI','/admin':'Admin — Nexora AI'};
+function DocumentMetadata(){const{pathname}=useLocation();useEffect(()=>{document.title=titles[pathname]||'Page not found — Nexora AI';let robots=document.querySelector('meta[name="robots"]') as HTMLMetaElement|null;if(!robots){robots=document.createElement('meta');robots.name='robots';document.head.appendChild(robots);}robots.content=pathname.startsWith('/dashboard')||['/review','/games','/career','/tutors','/groups','/accessibility','/admin'].includes(pathname)?'noindex,nofollow':'index,follow';},[pathname]);return null;}
+function Protected({children,admin=false,allowIncomplete=false}:{children:React.ReactNode;admin?:boolean;allowIncomplete?:boolean}){const{isAuthenticated,isLoading,user}=useAuthStore();if(isLoading)return <main id="main-content" className="flex min-h-screen items-center justify-center" aria-busy="true">Loading…</main>;if(!isAuthenticated)return <Navigate to="/login" replace/>;if(user&&!user.isEmailVerified)return <Navigate to="/verify-pending" replace/>;if(user&&!user.onboardingComplete&&!allowIncomplete)return <Navigate to="/onboarding" replace/>;if(admin&&user?.role!=='admin')return <Navigate to="/dashboard" replace/>;return <Layout>{children}</Layout>}
+const loading=<main id="main-content" className="flex min-h-screen items-center justify-center" aria-busy="true">Loading…</main>;
+export default function App(){const{loadUser,user}=useAuthStore();const store=useAccessibilityStore();useEffect(()=>{loadUser();},[loadUser]);useEffect(()=>{if(user?.accessibility)store.updateSettings(user.accessibility);},[user?.accessibility]);return <AccessibilityLifecycleWrapper><DocumentMetadata/><a href="#main-content" className="skip-link">Skip to main content</a><Suspense fallback={loading}><Routes>
+<Route path="/" element={<LandingPage/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/register" element={<RegisterPage/>}/><Route path="/forgot-password" element={<ForgotPasswordPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/verify-email" element={<VerifyEmailPage/>}/><Route path="/verify-pending" element={<VerifyPendingPage/>}/><Route path="/privacy" element={<LegalPage kind="privacy"/>}/><Route path="/terms" element={<LegalPage kind="terms"/>}/><Route path="/support" element={<LegalPage kind="support"/>}/>
+<Route path="/onboarding" element={<Protected allowIncomplete><OnboardingPage/></Protected>}/><Route path="/dashboard" element={<Protected><DashboardPage/></Protected>}/><Route path="/review" element={<Protected><ReviewPage/></Protected>}/><Route path="/games" element={<Protected><GamePage/></Protected>}/><Route path="/career" element={<Protected><CareerPage/></Protected>}/><Route path="/tutors" element={<Protected><TutorPage/></Protected>}/><Route path="/groups" element={<Protected><GroupsPage/></Protected>}/><Route path="/accessibility" element={<Protected><AccessibilityPage/></Protected>}/><Route path="/admin" element={<Protected admin><AdminPage/></Protected>}/><Route path="*" element={<NotFoundPage/>}/>
+</Routes></Suspense></AccessibilityLifecycleWrapper>}

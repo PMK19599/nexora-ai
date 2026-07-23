@@ -19,14 +19,8 @@ const storage = multer.diskStorage({
 export const upload = multer({
   storage,
   fileFilter: (_req, file, cb) => {
-    const ok = [
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ].includes(file.mimetype);
-    cb(ok ? null : new Error('File type not supported. Please upload PDF, JPEG, PNG, DOC or DOCX.') as any, ok);
+    const ok = file.mimetype === 'application/pdf' && path.extname(file.originalname).toLowerCase() === '.pdf';
+    cb(ok ? null : new Error('File type not supported. Please upload a PDF up to 10 MB.') as any, ok);
   },
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
