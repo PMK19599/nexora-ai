@@ -104,7 +104,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right form */}
-      <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto h-screen">
         <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 dark:bg-card/90 backdrop-blur-sm my-auto">
           <CardHeader className="text-center pb-2">
             <div className="lg:hidden text-5xl mb-3 animate-float">✦</div>
