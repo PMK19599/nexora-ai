@@ -1,9 +1,23 @@
 import { Link } from 'react-router-dom';
+import { useAccessibilityStore } from '@/stores/accessibilityStore';
 import { Button } from '@/components/ui/button';
+
+function DarkToggle() {
+  const { colorContrast, updateSettings } = useAccessibilityStore();
+  const isDark = colorContrast === 'dark';
+  const toggle = () => updateSettings({ colorContrast: isDark ? 'normal' : 'dark' });
+  return (
+    <button onClick={toggle} className="rounded-md p-2 hover:bg-accent transition-colors" aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}>
+      {isDark
+        ? <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        : <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>}
+    </button>
+  );
+}
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
@@ -11,7 +25,8 @@ export default function LandingPage() {
             <span className="text-3xl animate-float">✦</span>
             <span className="text-xl font-bold gradient-text">Nexora AI</span>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <DarkToggle />
             <Link to="/login"><Button variant="ghost" className="font-semibold">Log In</Button></Link>
             <Link to="/register"><Button className="bg-gradient-to-r from-teal-600 to-emerald-600 shadow-lg shadow-teal-500/25 font-semibold">Get Started Free</Button></Link>
           </div>
@@ -68,7 +83,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 bg-gradient-to-b from-white to-teal-50/30">
+      <section className="py-20 bg-gradient-to-b from-background to-teal-50/30 dark:to-teal-950/20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -100,16 +115,16 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Two Tracks, <span className="gradient-text">One Platform</span></h2>
           </div>
           <div className="grid gap-8 md:grid-cols-2">
-            <div className="rounded-2xl p-8 bg-gradient-to-br from-emerald-50 to-blue-50 border-2 border-teal-100 hover:shadow-xl transition-all">
-              <h3 className="text-2xl font-bold text-teal-700 mb-6 flex items-center gap-3">📘 Standard Track</h3>
+            <div className="rounded-2xl p-8 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/30 dark:to-blue-950/30 border-2 border-teal-100 dark:border-teal-800 hover:shadow-xl transition-all">
+              <h3 className="text-2xl font-bold text-teal-700 dark:text-teal-400 mb-6 flex items-center gap-3">📘 Standard Track</h3>
               <ul className="space-y-4">{['Long-term knowledge retention', 'Exam-focused preparation', 'Career readiness roadmaps', 'Competitive peer benchmarking', 'Advanced analytics dashboard'].map(x =>
-                <li key={x} className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center shrink-0"><svg className="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></div><span className="text-gray-700">{x}</span></li>
+                <li key={x} className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0"><svg className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></div><span className="text-foreground">{x}</span></li>
               )}</ul>
             </div>
-            <div className="rounded-2xl p-8 bg-gradient-to-br from-amber-50 to-teal-50 border-2 border-amber-100 hover:shadow-xl transition-all">
-              <h3 className="text-2xl font-bold text-amber-700 mb-6 flex items-center gap-3">♿ Neurodivergent Track</h3>
+            <div className="rounded-2xl p-8 bg-gradient-to-br from-amber-50 to-teal-50 dark:from-amber-950/30 dark:to-teal-950/30 border-2 border-amber-100 dark:border-amber-800 hover:shadow-xl transition-all">
+              <h3 className="text-2xl font-bold text-amber-700 dark:text-amber-400 mb-6 flex items-center gap-3">♿ Neurodivergent Track</h3>
               <ul className="space-y-4">{['🔵 ADHD: Focus mode & Pomodoro timer', '🟣 Autism: Predictable nav & schedules', '🟢 Dyslexia: OpenDyslexic font & TTS', 'Structured inclusive collaboration', 'Community support & mentoring'].map(x =>
-                <li key={x} className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center shrink-0"><svg className="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></div><span className="text-gray-700">{x}</span></li>
+                <li key={x} className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0"><svg className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></div><span className="text-foreground">{x}</span></li>
               )}</ul>
             </div>
           </div>
