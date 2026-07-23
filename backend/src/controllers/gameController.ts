@@ -5,7 +5,7 @@ import { User } from '../models';
 import pdfParse from 'pdf-parse';
 import fs from 'fs';
 import { askAI, getEmbedding } from '../utils/ai';
-import { uploadToCloudinary } from '../config/cloudinary';
+import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
 import { sliceTextIntoChunks, getRepresentativeChunks } from '../utils/embeddings';
 
 async function generateQuestionsWithAI(text: string, count: number = 10, recentAccuracy: number = 70): Promise<any[]> {
@@ -152,9 +152,11 @@ export const createGameFromPDF = async (req: AuthRequest, res: Response, next: N
 
     // Upload to Cloudinary for production reference storage
     let pdfUrl = '';
+    let pdfPublicId = '';
     try {
       const uploadRes = await uploadToCloudinary(file.path, 'nexora_pdfs');
       pdfUrl = uploadRes.url;
+      pdfPublicId = uploadRes.publicId;
     } catch (err) {
       console.warn('Failed to upload PDF to Cloudinary:', err);
     }
@@ -212,6 +214,7 @@ export const createGameFromPDF = async (req: AuthRequest, res: Response, next: N
       sourceChunks: chunks,
       syllabusChunks,
       pdfUrl,
+      pdfPublicId,
       topicId: req.body.topicId || undefined,
       questions,
       gameType: req.body.gameType || 'quiz',
@@ -272,7 +275,7 @@ export const getMyGames = async (req: AuthRequest, res: Response, next: NextFunc
 
 export const getGame = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const game = await Game.findById(req.params.id);
+    const game = await Game.findOne({ _id: req.params.id, $or: [{ userId: req.user!._id }, { isPublic: true }] });
     if (!game) { res.status(404).json({ success: false, message: 'Game not found' }); return; }
     res.json({ success: true, data: game });
   } catch (e) { next(e); }
@@ -282,7 +285,7 @@ export const submitGameSession = async (req: AuthRequest, res: Response, next: N
   try {
     const { gameId, answers, timeTaken } = req.body;
 
-    const game = await Game.findById(gameId);
+    const game = await Game.findOne({ _id: gameId, $or: [{ userId: req.user!._id }, { isPublic: true }] });
     if (!game) { res.status(404).json({ success: false, message: 'Game not found' }); return; }
 
     let score = 0;
@@ -447,6 +450,10 @@ export const getLeaderboard = async (_req: AuthRequest, res: Response, next: Nex
   } catch (e) { next(e); }
 };
 
+export const deleteGame = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try { const game = await Game.findOneAndDelete({ _id: req.params.id, userId: req.user!._id }).select('+pdfPublicId'); if (!game) { res.status(404).json({ success:false, message:'Quiz not found' }); return; } if ((game as any).pdfPublicId) { try { await deleteFromCloudinary((game as any).pdfPublicId); } catch {} } await GameSession.deleteMany({ gameId: game._id, userId: req.user!._id }); res.json({ success:true, message:'Quiz and its saved sessions were deleted.' }); } catch(e) { next(e); }
+};
+
 export const getRecommendedGames = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Collaborative filtering for curriculum sharing
@@ -466,7 +473,7 @@ export const getRecommendedGames = async (req: AuthRequest, res: Response, next:
 
     // Get highly rated or completed games from those similar users
     const recommendedGames = await Game.find({
-      userId: { $in: similarUserIds }
+      userId: { $in: similarUserIds }, isPublic: true
     })
     .sort({ createdAt: -1 })
     .limit(5)

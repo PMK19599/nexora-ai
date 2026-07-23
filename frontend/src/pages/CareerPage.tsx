@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { careerAPI } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -42,6 +42,7 @@ export default function CareerPage() {
     onError: (e: any) => toast.error(e.response?.data?.message || 'Failed to share roadmap'),
   });
   const handleShare = (id: string) => shareM.mutate(id);
+  const deleteM = useMutation({ mutationFn: (id: string) => careerAPI.deletePath(id), onSuccess: () => { toast.success('Career path deleted.'); setSelId(null); qc.invalidateQueries({ queryKey: ['careerPaths'] }); qc.invalidateQueries({ queryKey: ['roadmaps'] }); }, onError: () => toast.error('Could not delete this career path.') });
 
   const isNeurodivergent = user?.learningTrack === 'neurodivergent' || user?.neurodivergentType !== 'none';
 
@@ -52,27 +53,30 @@ export default function CareerPage() {
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStep, setUploadStep] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const uploadAbort = useRef<AbortController | null>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f || !dj || !co) { toast.error('Enter job & company, then upload PDF'); return; }
+    if (f.type !== 'application/pdf' || !f.name.toLowerCase().endsWith('.pdf')) { toast.error('Choose a PDF file.'); e.target.value=''; return; }
+    if (f.size > 10 * 1024 * 1024) { toast.error('PDF must be 10 MB or smaller.'); e.target.value=''; return; }
     const fd = new FormData();
     fd.append('syllabus', f); fd.append('dreamJob', dj); fd.append('company', co);
     try {
       setIsUploading(true);
-      setUploadStep('Extracting text from PDF...');
+      setUploadProgress(0);
+      uploadAbort.current = new AbortController();
+      setUploadStep('Uploading and processing PDF…');
       
-      // Simulate multi-step AI process for UX transparency
-      setTimeout(() => setUploadStep('Chunking document and identifying key concepts...'), 1500);
-      setTimeout(() => setUploadStep('Generating customized quiz and career gap analysis...'), 3500);
-      
-      const { data } = await careerAPI.uploadSyllabus(fd);
+      const { data } = await careerAPI.uploadSyllabus(fd, { signal: uploadAbort.current.signal, onUploadProgress: p => setUploadProgress(p.total ? Math.round((p.loaded / p.total) * 100) : 0) });
       toast.success('📄 Syllabus analyzed successfully!');
       setSelId(data.data._id);
       qc.invalidateQueries({ queryKey: ['careerPaths'] });
-    } catch { 
-      toast.error('Upload failed'); 
+    } catch (error: any) { 
+      toast.error(error?.code === 'ERR_CANCELED' ? 'Upload cancelled.' : 'Upload failed. You can retry with the same file.'); 
     } finally {
+      uploadAbort.current = null;
       setIsUploading(false);
       setUploadStep('');
     }
@@ -135,11 +139,13 @@ export default function CareerPage() {
               <div className="space-y-2">
                 <Label className="font-semibold">Upload Syllabus / Course Outline (optional)</Label>
                 <Input type="file" accept=".pdf" onChange={handleUpload} disabled={isUploading || anM.isPending} />
+                <p className="text-xs text-muted-foreground">PDF only, maximum 10 MB. Your file is private to your account and can be removed with its generated career record.</p>
                 {isUploading && (
                   <div className="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
                     <div className="flex items-center gap-3">
                       <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full" />
-                      <p className="text-sm font-semibold text-blue-800">{uploadStep}</p>
+                      <p className="text-sm font-semibold text-blue-800">{uploadStep} {uploadProgress ? `(${uploadProgress}%)` : ''}</p>
+                      <Button type="button" size="sm" variant="outline" onClick={() => uploadAbort.current?.abort()}>Cancel upload</Button>
                     </div>
                   </div>
                 )}
@@ -162,7 +168,7 @@ export default function CareerPage() {
                         <h3 className="text-lg font-bold">{p.dreamJob}</h3>
                         <p className="text-sm text-muted-foreground">at {p.company}</p>
                       </div>
-                      <SpeakButton text={`${p.dreamJob} at ${p.company}. Required skills: ${p.requiredSkills?.join(', ')}`} />
+                      <div className="flex gap-2"><SpeakButton text={`${p.dreamJob} at ${p.company}. Required skills: ${p.requiredSkills?.join(', ')}`} /><Button size="sm" variant="outline" onClick={e => { e.stopPropagation(); if (window.confirm('Delete this career path and its uploaded syllabus?')) deleteM.mutate(p._id); }}>Delete</Button></div>
                     </div>
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {p.requiredSkills?.map((s: string) => <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>)}

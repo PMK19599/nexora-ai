@@ -26,7 +26,15 @@ const accessibilitySchema = new Schema({
 const userSchema = new Schema<IUser>({
   name: { type: String, required: [true, 'Name is required'], trim: true, maxlength: 100 },
   email: { type: String, required: [true, 'Email is required'], unique: true, lowercase: true, match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'] },
-  password: { type: String, required: [true, 'Password is required'], minlength: 6, select: false },
+  password: { type: String, required: [true, 'Password is required'], minlength: 8, maxlength: 128, select: false },
+  isEmailVerified: { type: Boolean, default: true },
+  onboardingComplete: { type: Boolean, default: true },
+  emailVerificationToken: { type: String, select: false },
+  emailVerificationExpires: { type: Date, select: false },
+  passwordResetToken: { type: String, select: false },
+  passwordResetExpires: { type: Date, select: false },
+  verificationSentAt: { type: Date, select: false },
+  tokenVersion: { type: Number, default: 0, select: false },
   role: { type: String, enum: ['student','tutor','admin'], default: 'student' },
   avatar: { type: String, default: '' },
   learningTrack: { type: String, enum: ['normal','neurodivergent'], default: 'normal' },
@@ -60,8 +68,8 @@ userSchema.methods.comparePassword = async function(password: string): Promise<b
 
 userSchema.methods.getSignedJwtToken = function(): string {
   return jwt.sign(
-    { id: this._id, role: this.role },
-    process.env.JWT_SECRET || 'neurolearn-jwt-secret-dev-2026',
+    { id: this._id, role: this.role, version: this.tokenVersion || 0 },
+    process.env.JWT_SECRET || 'development-only-change-me',
     { expiresIn: (process.env.JWT_EXPIRE || '7d') as any }
   );
 };

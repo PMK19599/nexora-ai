@@ -24,8 +24,8 @@ export const validate = (schema: ZodSchema) => (req: Request, res: Response, nex
 export const registerSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Name is required'),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    email: z.string().trim().toLowerCase().email('Please enter a valid email address').max(254, 'Email is too long'),
+    password: z.string().min(8, 'Password must be at least 8 characters').max(128, 'Password must be at most 128 characters'),
   }).passthrough(),
 });
 

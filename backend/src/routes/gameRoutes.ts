@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createGameFromPDF, createGameFromText, getMyGames, getGame, submitGameSession, getGameHistory, getLeaderboard, getRecommendedGames } from '../controllers/gameController';
+import { createGameFromPDF, createGameFromText, getMyGames, getGame, submitGameSession, getGameHistory, getLeaderboard, getRecommendedGames, deleteGame } from '../controllers/gameController';
 import { protect } from '../middleware/auth';
 import { upload } from '../middleware/upload';
 
@@ -11,6 +11,7 @@ r.get('/history', protect, getGameHistory);
 r.get('/leaderboard', protect, getLeaderboard);
 r.get('/recommended', protect, getRecommendedGames);
 r.get('/:id', protect, getGame);
+r.delete('/:id', protect, deleteGame);
 r.post('/submit', protect, submitGameSession);
 
 export default r;

@@ -23,6 +23,8 @@ export interface IGame extends Document {
   totalQuestions: number;
   timeLimit: number;
   pdfUrl?: string;
+  pdfPublicId?: string;
+  isPublic: boolean;
   topicId?: Types.ObjectId;
   createdAt: Date;
 }
@@ -49,7 +51,9 @@ const gameSchema = new Schema<IGame>({
   sourceContent: { type: String, default: '' },
   sourceChunks: [{ type: String }],
   syllabusChunks: [{ text: { type: String }, embedding: [{ type: Number }] }],
-  pdfUrl: { type: String, default: '' },
+  pdfUrl: { type: String, default: '', select: false },
+  pdfPublicId: { type: String, default: '', select: false },
+  isPublic: { type: Boolean, default: false },
   topicId: { type: Schema.Types.ObjectId, ref: 'Topic' },
   questions: [{
     question: { type: String, required: true },

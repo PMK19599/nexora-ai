@@ -40,15 +40,9 @@ npm run dev
 npm run seed
 ```
 
-## 🔑 Demo Accounts (after seeding)
+## Test data
 
-| Account | Email | Password |
-|---------|-------|----------|
-| Admin | admin@neurolearn.ai | admin123456 |
-| Student | alice@example.com | password123 |
-| ADHD | bob@example.com | password123 |
-| Dyslexia | carol@example.com | password123 |
-| Autism | david@example.com | password123 |
+Seeded privileged accounts are disabled by default. For local-only administration, set ignored `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` values before running the seeder. Never reuse these values in production.
 
 ## 🔧 Troubleshooting
 

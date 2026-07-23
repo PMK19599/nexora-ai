@@ -1,19 +1,10 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { navigationItems, adminNavigationItem } from '@/config/navigation';
 
-const primaryTabs = [
-  { path: '/dashboard', label: 'Home', icon: '📊' },
-  { path: '/review', label: 'Review', icon: '🧠' },
-  { path: '/games', label: 'Play', icon: '🎮' },
-  { path: '/career', label: 'Career', icon: '🚀' },
-];
-
-const moreTabs = [
-  { path: '/tutors', label: 'Peer Tutors', icon: '👥' },
-  { path: '/groups', label: 'Study Groups', icon: '📚' },
-  { path: '/accessibility', label: 'Accessibility', icon: '♿' },
-];
+const primaryTabs = navigationItems.slice(0, 4).map(i => ({ ...i, label: i.shortLabel }));
+const moreTabs = navigationItems.slice(4);
 
 export default function MobileBottomNav() {
   const [showMore, setShowMore] = useState(false);
@@ -21,7 +12,7 @@ export default function MobileBottomNav() {
   const { user } = useAuthStore();
 
   const allMoreTabs = user?.role === 'admin'
-    ? [...moreTabs, { path: '/admin', label: 'Admin Panel', icon: '⚙️' }]
+    ? [...moreTabs, adminNavigationItem]
     : moreTabs;
 
   const isMoreActive = allMoreTabs.some(t => location.pathname === t.path);

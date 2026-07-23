@@ -9,7 +9,8 @@ const schema = new Schema<ICareerPath>({
   industryExpectations: [String],
   interviewTopics: [String],
   techStack: [String],
-  pdfUrl: { type: String, default: '' },
+  pdfUrl: { type: String, default: '', select: false },
+  pdfPublicId: { type: String, default: '', select: false },
   syllabusChunks: [{ text: { type: String }, embedding: [{ type: Number }] }],
 }, { timestamps: true });
 schema.index({ userId: 1 });

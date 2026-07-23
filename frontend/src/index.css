@@ -86,9 +86,10 @@
 
   * { @apply border-border; }
   html, body {
-    @apply h-full overflow-hidden select-none bg-[#0a0f19] text-foreground antialiased;
-    /* Kill loose mobile web bounce rubber-banding completely */
-    overscroll-behavior-y: none;
+    @apply min-h-full bg-background text-foreground antialiased;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
     -webkit-overflow-scrolling: touch;
     
     /* Enforce modern safe-area notches support across device boundaries */
@@ -106,10 +107,10 @@
     font-size: 130% !important;
   }
   
-  body.line-spacing-extra * {
-    line-height: 1.95 !important;
-    letter-spacing: 0.04em !important;
-  }
+  body.font-size-small { font-size: 87.5%; }
+  body.line-spacing-wide #main-content :is(p,li,article) { line-height: 1.9; }
+  body.line-spacing-wider #main-content :is(p,li,article) { line-height: 2.1; }
+  body.line-spacing-extra #main-content :is(p,li,article) { line-height: 2.3; letter-spacing: 0.03em; }
 
   /* Smooth performance rules for reduced animation sensitivities */
   body.reduced-motion-active * {
@@ -142,9 +143,12 @@
 .font-dyslexic, .font-dyslexic * { font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important; }
 .font-arial, .font-arial * { font-family: Arial, Helvetica, sans-serif !important; }
 .font-verdana, .font-verdana * { font-family: Verdana, Geneva, sans-serif !important; }
+.font-vazirmatn, .font-vazirmatn * { font-family: Vazirmatn, Tahoma, Arial, sans-serif !important; }
 
 /* ===== MODES ===== */
-.reading-mode { max-width: 65ch; margin-inline: auto; }
+body.reading-mode #main-content > * { max-width: 65ch; margin-inline: auto; }
+body.reduced-distractions .non-essential { display: none !important; }
+body.predictable-navigation nav { transition: none !important; }
 .focus-mode .non-essential { opacity: 0.2; transition: opacity 0.3s; }
 .focus-mode .non-essential:hover { opacity: 1; }
 .no-animations *, .no-animations *::before, .no-animations *::after {
@@ -214,3 +218,7 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.25); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.4); }
+
+.auth-page { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: max(1.5rem, env(safe-area-inset-top)) 1rem max(1.5rem, env(safe-area-inset-bottom)); overflow: visible; }
+.auth-card { width: 100%; max-width: 28rem; background: rgba(255,255,255,.92); }
+@media (max-height: 600px), (max-width: 360px) { .auth-page { align-items: flex-start; } }

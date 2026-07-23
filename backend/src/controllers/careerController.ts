@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../types';
 import * as svc from '../services/careerService';
 import { CareerPath, Roadmap, User } from '../models';
+import { deleteFromCloudinary } from '../config/cloudinary';
 
 export const uploadSyllabus = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -38,6 +39,10 @@ export const getIndustryInsights = async (req: AuthRequest, res: Response, next:
 
 export const getCareerPaths = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try { res.json({ success: true, data: await CareerPath.find({ userId: req.user!._id }).sort({ createdAt: -1 }) }); } catch (e) { next(e); }
+};
+
+export const deleteCareerPath = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try { const path = await CareerPath.findOne({ _id: req.params.id, userId: req.user!._id }).select('+pdfPublicId'); if (!path) { res.status(404).json({ success:false, message:'Career path not found' }); return; } if ((path as any).pdfPublicId) { try { await deleteFromCloudinary((path as any).pdfPublicId); } catch {} } await Promise.all([CareerPath.deleteOne({ _id:path._id }), Roadmap.deleteMany({ careerPathId:path._id, userId:req.user!._id })]); res.json({ success:true, message:'Career path and uploaded syllabus were deleted.' }); } catch(e) { next(e); }
 };
 
 export const getRoadmaps = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {

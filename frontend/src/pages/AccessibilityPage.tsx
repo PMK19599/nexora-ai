@@ -13,7 +13,7 @@ import DiagnosticTest from '@/components/diagnostic/DiagnosticTest';
 import toast from 'react-hot-toast';
 
 export default function AccessibilityPage() {
-  const { settings: s, updateSettings: up, resetSettings, applyPreset } = useAccessibilityStore();
+  const { settings: s, updateSettings: up, applyPreset } = useAccessibilityStore();
   const { user, updateProfile } = useAuthStore();
   const { speak, stop, isSpeaking } = useTTS();
   const [showDiagnostic, setShowDiagnostic] = useState(false);
@@ -68,7 +68,7 @@ export default function AccessibilityPage() {
           <p className="text-muted-foreground">Customize everything to suit your needs. Changes apply instantly.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={resetSettings}>Reset All</Button>
+          <Button variant="outline" onClick={() => handleApplyPreset('none')}>Reset & Save</Button>
           <Button onClick={save} className="bg-gradient-to-r from-teal-600 to-emerald-600">💾 Save Settings</Button>
         </div>
       </div>
@@ -145,8 +145,8 @@ export default function AccessibilityPage() {
                 <SelectContent>
                   <SelectItem value="normal">Normal (1.6x)</SelectItem>
                   <SelectItem value="wide">Wide (1.9x) — easier to read</SelectItem>
-                  <SelectItem value="wider">Wider (2.3x)</SelectItem>
-                  <SelectItem value="extra">Extra Wide (1.95x)</SelectItem>
+                  <SelectItem value="wider">Wider (2.1x)</SelectItem>
+                  <SelectItem value="extra">Extra Wide (2.3x)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

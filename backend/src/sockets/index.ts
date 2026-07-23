@@ -36,11 +36,12 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
 
   io.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization?.split(' ')[1];
+      const cookie = socket.handshake.headers.cookie || '';
+      const token = cookie.split(';').map(v => v.trim()).find(v => v.startsWith('nexora_session='))?.slice('nexora_session='.length);
       if (!token) return next(new Error('Auth required'));
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'neurolearn-jwt-secret-dev-2026') as { id: string };
-      const user = await User.findById(decoded.id);
-      if (!user) return next(new Error('User not found'));
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'development-only-change-me') as { id: string; version: number };
+      const user = await User.findById(decoded.id).select('+tokenVersion');
+      if (!user || (user.tokenVersion || 0) !== (decoded.version || 0)) return next(new Error('Session revoked'));
       (socket as any).userId = user._id.toString();
       (socket as any).userName = user.name;
       next();

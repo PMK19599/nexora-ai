@@ -1,0 +1,2 @@
+import { Link } from 'react-router-dom';
+export default function NotFoundPage(){return <main id="main-content" className="flex min-h-screen items-center justify-center bg-background p-6 text-center"><div><p className="text-sm font-semibold text-primary">404</p><h1 className="text-4xl font-bold">Page not found</h1><p className="my-4 text-muted-foreground">The page may have moved or the address may be incorrect.</p><Link className="text-primary underline" to="/">Return to Nexora AI</Link></div></main>}
