@@ -80,7 +80,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main id="main-content" className="flex h-screen overflow-hidden auth-bg">
+    <main id="main-content" className="min-h-screen flex flex-col md:flex-row auth-bg">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-700">
         <div className="absolute inset-0 opacity-10">
@@ -104,7 +104,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right form */}
-      <div className="h-full w-full lg:w-1/2 overflow-y-auto py-12 flex flex-col">
+      <div className="w-full lg:w-1/2 py-12 flex flex-col">
         <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 dark:bg-card/90 backdrop-blur-sm m-auto">
           <CardHeader className="text-center pb-2">
             <div className="lg:hidden text-5xl mb-3 animate-float">✦</div>
