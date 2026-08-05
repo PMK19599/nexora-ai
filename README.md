@@ -71,10 +71,6 @@ MongoDB must be running locally or configured through `MONGODB_URI`.
 Explain which AI agents were used and that generated changes were reviewed,
 tested and accepted by the team.
 
-## Current Status
-
-Beta preparation; production deployment gates remain.
-
 ## Known Limitations
 
 - Production deployment and third-party service configuration still require final verification.
