@@ -89,6 +89,11 @@ Beta preparation; production deployment gates remain.
 
 ## Known Limitations
 
+- Production deployment and third-party service configuration still require final verification.
+- Real email delivery, media upload, and AI-provider behaviour depend on valid production credentials.
+- Cross-browser, mobile-device, and accessibility testing is still ongoing.
+- AI-generated learning content should be reviewed by educators before high-stakes use.
+
 ## License
 
 ## My Contribution
