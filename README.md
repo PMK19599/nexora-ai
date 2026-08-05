@@ -36,7 +36,12 @@ into accessibility-aware learning experiences.
 
 ## Tech Stack
 
-...
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, ShadCN UI, Zustand, React Query
+- **Backend:** Node.js, Express, TypeScript, Socket.io
+- **Database:** MongoDB with Mongoose
+- **Authentication:** JWT with HttpOnly cookies
+- **AI:** Groq-powered content transformation
+- **Deployment:** Vercel and Render
 
 ## Local Development
 
