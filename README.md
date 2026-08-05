@@ -1,62 +1,85 @@
-# 🧠 Nexora AI — AI-Powered E-Learning Platform
+# Nexora AI
 
-## ⚡ Quick Start (3 steps)
+AI-powered adaptive learning infrastructure designed for students with
+ADHD, autism and dyslexia.
 
-### Step 1: Install dependencies
-```bash
-cd nexora-ai
-npm run install:all
-```
+## Problem
 
-### Step 2: Start MongoDB (REQUIRED — pick one option)
+Most learning platforms deliver the same material in the same format,
+even though neurodivergent learners may require different presentation,
+pacing and interaction styles.
 
-**Option A — Install MongoDB locally (easiest):**
-- Download from https://www.mongodb.com/try/download/community
-- Install it, then run `mongod` in a terminal
-- The default URI `mongodb://127.0.0.1:27017/nexora` will work automatically
+## Solution
 
-**Option B — Docker (if you have Docker):**
-```bash
-docker run -d -p 27017:27017 --name mongodb mongo:7
-```
+Nexora allows educators to upload learning material and reconstructs it
+into accessibility-aware learning experiences.
 
-**Option C — MongoDB Atlas (free cloud):**
-1. Go to https://cloud.mongodb.com
-2. Create a free cluster → Get connection string
-3. Edit `backend/.env` and set:
-   ```
-   MONGODB_URI=mongodb+srv://youruser:yourpass@cluster.mongodb.net/nexora
-   ```
+## Key Features
 
-### Step 3: Run the app
-```bash
-npm run dev
-```
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5000
+- ADHD-focused content restructuring
+- Dyslexia-friendly presentation
+- Autism-aware learning flows
+- Educator and student dashboards
+- Real-time communication
+- Accessibility preferences
+- AI-assisted material transformation
+- Secure authentication
 
-### Optional: Seed test data
-```bash
-npm run seed
-```
+## Screenshots
 
-## Test data
+[Add 3–5 screenshots]
 
-Seeded privileged accounts are disabled by default. For local-only administration, set ignored `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` values before running the seeder. Never reuse these values in production.
+## System Architecture
 
-## 🔧 Troubleshooting
+[Add architecture diagram]
 
-### "ECONNREFUSED" or "status code 500"
-→ MongoDB is not running. Start it with `mongod` or use Atlas.
+## Tech Stack
 
-### "Cannot reach the server"
-→ Backend is not running. Open a terminal and run `cd backend && npm run dev`
+...
 
-### Registration fails
-→ Check the terminal where backend runs for error messages. Usually it's a MongoDB issue.
+## Local Development
 
-## 📦 Tech Stack
-- **Frontend:** React 19, Vite, TypeScript, TailwindCSS, ShadCN UI, Zustand, React Query
-- **Backend:** Node.js, Express, TypeScript, Socket.io, JWT, Mongoose
-- **Database:** MongoDB
-- **AI:** Anthropic Claude API (optional)
+...
+
+## Testing
+
+- Frontend: 8 tests
+- Backend: 26 tests
+- End-to-end: 11 tests
+- Total: 45/45 passing
+
+## Security Improvements
+
+- HttpOnly cookie authentication
+- Removed public privileged seed credentials
+- Input validation
+- Environment-based configuration
+- ...
+
+## My Contribution
+
+- Product concept and scope
+- Accessibility feature planning
+- Deployment coordination
+- QA and audit remediation
+- Security review management
+- ...
+
+## Team
+
+List each member and role honestly.
+
+## AI-Assisted Development
+
+Explain which AI agents were used and that generated changes were reviewed,
+tested and accepted by the team.
+
+## Current Status
+
+Beta preparation; production deployment gates remain.
+
+## Known Limitations
+
+...
+
+## License
