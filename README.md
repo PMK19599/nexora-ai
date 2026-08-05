@@ -68,8 +68,7 @@ MongoDB must be running locally or configured through `MONGODB_URI`.
 
 ## AI-Assisted Development
 
-Explain which AI agents were used and that generated changes were reviewed,
-tested and accepted by the team.
+AI coding assistants were used for implementation support, debugging, auditing, and remediation. Generated changes were reviewed, tested, and accepted by the team before being merged.
 
 ## Known Limitations
 
