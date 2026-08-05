@@ -33,7 +33,6 @@ into accessibility-aware learning experiences.
 
 ## System Architecture
 
-[Add architecture diagram]
 
 ## Tech Stack
 
