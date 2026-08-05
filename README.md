@@ -29,7 +29,7 @@ into accessibility-aware learning experiences.
 
 ## Screenshots
 
-[![Nexora AI landing page](Landing-page.png)
+![Nexora AI landing page](Landing-page.png)
 
 
 ## Tech Stack
