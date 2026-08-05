@@ -29,7 +29,7 @@ into accessibility-aware learning experiences.
 
 ## Screenshots
 
-[Add 3–5 screenshots]
+[![Nexora AI landing page](Landing-page.png)
 
 ## System Architecture
 
