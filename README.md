@@ -86,6 +86,13 @@ Beta preparation; production deployment gates remain.
 
 ## License
 
+## My Contribution
+
+- Product direction and feature planning
+- Accessibility-focused workflow design
+- Deployment coordination
+- QA, audit review, and remediation tracking
+- Security and release-readiness improvements
 
 ## Current Status
 
