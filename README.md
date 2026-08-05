@@ -31,8 +31,6 @@ into accessibility-aware learning experiences.
 
 [![Nexora AI landing page](Landing-page.png)
 
-## System Architecture
-
 
 ## Tech Stack
 
