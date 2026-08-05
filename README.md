@@ -94,6 +94,12 @@ Beta preparation; production deployment gates remain.
 - QA, audit review, and remediation tracking
 - Security and release-readiness improvements
 
+## Team
+
+Nexora AI was developed as a team project for Hack4Soc 3.0.
+
+Team member names and individual responsibilities will be documented here after final confirmation.
+
 ## Current Status
 
 The core application has completed a major remediation pass. Local builds and automated tests are passing. Remaining work includes deployed-environment verification, production service configuration, and final browser/device testing.
