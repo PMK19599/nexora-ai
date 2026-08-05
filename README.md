@@ -66,18 +66,6 @@ MongoDB must be running locally or configured through `MONGODB_URI`.
 - Input validation
 - Environment-based configuration
 
-## My Contribution
-
-- Product concept and scope
-- Accessibility feature planning
-- Deployment coordination
-- QA and audit remediation
-- Security review management
-
-## Team
-
-List each member and role honestly.
-
 ## AI-Assisted Development
 
 Explain which AI agents were used and that generated changes were reviewed,
