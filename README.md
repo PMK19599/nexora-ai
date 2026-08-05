@@ -1,5 +1,7 @@
 # Nexora AI
 
+> **Project status:** Active development. Core remediation is complete; deployment and production verification are still in progress.
+
 AI-powered adaptive learning infrastructure designed for students with
 ADHD, autism and dyslexia.
 
