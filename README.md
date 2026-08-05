@@ -65,7 +65,6 @@ MongoDB must be running locally or configured through `MONGODB_URI`.
 - Removed public privileged seed credentials
 - Input validation
 - Environment-based configuration
-- ...
 
 ## My Contribution
 
@@ -74,7 +73,6 @@ MongoDB must be running locally or configured through `MONGODB_URI`.
 - Deployment coordination
 - QA and audit remediation
 - Security review management
-- ...
 
 ## Team
 
@@ -90,8 +88,6 @@ tested and accepted by the team.
 Beta preparation; production deployment gates remain.
 
 ## Known Limitations
-
-...
 
 ## License
 
