@@ -43,7 +43,14 @@ into accessibility-aware learning experiences.
 
 ## Local Development
 
-...
+```bash
+npm run install:all
+npm run dev
+```
+
+The frontend runs on `http://localhost:5173` and the backend runs on `http://localhost:5000`.
+
+MongoDB must be running locally or configured through `MONGODB_URI`.
 
 ## Testing
 
