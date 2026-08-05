@@ -60,5 +60,3 @@ Seeded privileged accounts are disabled by default. For local-only administratio
 - **Backend:** Node.js, Express, TypeScript, Socket.io, JWT, Mongoose
 - **Database:** MongoDB
 - **AI:** Anthropic Claude API (optional)
-
-Vercel Git connection test.
