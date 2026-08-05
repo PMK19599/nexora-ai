@@ -82,8 +82,6 @@ Beta preparation; production deployment gates remain.
 - Cross-browser, mobile-device, and accessibility testing is still ongoing.
 - AI-generated learning content should be reviewed by educators before high-stakes use.
 
-## License
-
 ## My Contribution
 
 - Product direction and feature planning
