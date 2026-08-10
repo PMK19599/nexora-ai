@@ -91,7 +91,7 @@ Nexora AI was developed by Team NEXORA for Hack4Soc 3.0.
 
 - Purushotham K — Product direction, accessibility-focused workflows, deployment coordination, QA, and release-readiness improvements
 - Gagan M — Frontend development, interface implementation, and UI integration
-- Jayanth B S — [Backend development, APIs, database integration, and application logic
+- Jayanth B S — Backend development, APIs, database integration, and application logic
 
 ## Current Status
 
