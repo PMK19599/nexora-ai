@@ -89,9 +89,9 @@ AI coding assistants were used for implementation support, debugging, auditing, 
 
 Nexora AI was developed by Team NEXORA for Hack4Soc 3.0.
 
-- Purushotham K — Product direction, accessibility-focused workflows, deployment coordination, QA, and release-readiness improvements
-- Gagan M — Frontend development, interface implementation, and UI integration
-- Jayanth B S — Backend development, APIs, database integration, and application logic
+- [Purushotham K](https://github.com/PMK19599) — Product direction, accessibility-focused workflows, deployment coordination, QA, and release-readiness improvements
+- [Gagan M](https://github.com/Gagan234-M) — Frontend development, interface implementation, and UI integration
+- [Jayanth B S](https://github.com/jayanthbs24-star) — Backend development, APIs, database integration, and application logic
 
 ## Current Status
 
