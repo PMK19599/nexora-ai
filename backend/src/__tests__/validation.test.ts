@@ -41,7 +41,7 @@ describe('validate middleware', () => {
       const { req, res, next } = mockReqRes({ name: 'Test', email: 'test@example.com', password: '12345' });
       validate(registerSchema)(req, res, next);
       expect(res.statusCode).toBe(400);
-      expect(res.body.message).toContain('6 characters');
+      expect(res.body.message).toContain('8 characters');
     });
 
     it('allows extra fields with passthrough', () => {
