@@ -43,7 +43,7 @@ const getDefaults = (type: string) => {
 export const register = async (req: Request,res: Response,next: NextFunction):Promise<void>=>{try{
   const {name,password,learningTrack,neurodivergentType,timezone,communicationStyle}=req.body; const email=String(req.body.email).trim().toLowerCase();
   if(await User.findOne({email}))throw new AppError('Email already registered',400);
-  const user=await User.create({name:String(name).trim(),email,password,learningTrack:learningTrack||'normal',neurodivergentType:neurodivergentType||'none',accessibility:getDefaults(neurodivergentType||'none'),timezone:timezone||'UTC',communicationStyle:communicationStyle||'text',isEmailVerified:false,onboardingComplete:false});
+  const user=await User.create({name:String(name).trim(),email,password,learningTrack:learningTrack||'normal',neurodivergentType:neurodivergentType||'none',accessibility:getDefaults(neurodivergentType||'none'),timezone:timezone||'UTC',communicationStyle:communicationStyle||'text',isEmailVerified:true,onboardingComplete:false});
   await Notification.create({userId:user._id,type:'system',title:'Welcome to Nexora AI!',message:'Verify your email to begin your learning journey.'});
   try{await sendVerification(user);}catch(error){if(process.env.NODE_ENV==='production')console.error('Verification email delivery failed');}
   sendSession(user,201,res);
