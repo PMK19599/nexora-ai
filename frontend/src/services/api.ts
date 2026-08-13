@@ -28,7 +28,8 @@ api.interceptors.response.use(
         status: 0,
       };
     }
-    if (error.response.status === 401 && !['/login', '/register', '/', '/forgot-password', '/reset-password', '/verify-email', '/verify-pending'].includes(window.location.pathname)) {
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    if (error.response.status === 401 && !['/login', '/register', '/', '/forgot-password', '/reset-password', '/verify-email', '/verify-pending'].includes(path)) {
       window.location.href = '/login';
     }
     return Promise.reject(error);
