@@ -12,8 +12,12 @@ const connectDB = async (): Promise<void> => {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 4000 });
     console.log(`\n✅ MongoDB Connected: ${mongoose.connection.host}\n`);
     return;
-  } catch {
-    console.warn(`\n⚠️  Cannot connect to MongoDB at ${uri}`);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('\n❌ FATAL: Cannot connect to production MongoDB. Aborting to prevent data loss.');
+      throw error;
+    }
+    console.warn('\n⚠️  Cannot connect to configured MongoDB. Proceeding to in-memory fallback...');
   }
 
   // Step 2: Auto-start in-memory MongoDB
