@@ -49,8 +49,8 @@ export default function LandingPage() {
             <span className="gradient-text">Not Harder</span>
           </h1>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed">
-            The first AI learning platform built for <strong>every mind</strong>. Personalized study paths, 
-            career roadmaps, and peer tutoring — with full accessibility for neurodivergent learners.
+            An AI-powered learning platform built for different ways of learning. Personalized study paths, 
+            career roadmaps, peer learning, and accessibility-focused tools in one place.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/register">
@@ -68,10 +68,10 @@ export default function LandingPage() {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 mt-16">
             {[
-              { n: '10K+', l: 'Active Learners' },
-              { n: '98%', l: 'Retention Rate' },
-              { n: '4.9★', l: 'User Rating' },
-              { n: '24/7', l: 'AI Assistance' },
+              { n: 'AI', l: 'Adaptive Learning' },
+              { n: 'SM-2', l: 'Smart Review' },
+              { n: '2 Tracks', l: 'Learning Modes' },
+              { n: 'A11y', l: 'Accessibility First' },
             ].map(s => (
               <div key={s.l} className="text-center">
                 <div className="text-3xl font-bold gradient-text">{s.n}</div>
@@ -141,7 +141,7 @@ export default function LandingPage() {
             </div>
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Learn Smarter?</h2>
-              <p className="text-amber-100 text-lg mb-8 max-w-xl mx-auto">Join Nexora AI today. Free forever for students.</p>
+              <p className="text-amber-100 text-lg mb-8 max-w-xl mx-auto">Join Nexora AI today. Free for students.</p>
               <Link to="/register"><Button size="lg" className="text-lg px-12 py-7 bg-white text-teal-700 hover:bg-gray-50 font-bold rounded-xl shadow-2xl">Create Free Account →</Button></Link>
             </div>
           </div>
