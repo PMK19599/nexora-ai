@@ -58,4 +58,12 @@ test.describe('Auth Flow Routes', () => {
     await expect(page).toHaveTitle('Verify email — Nexora AI');
     await expect(page.locator('text=Verifying').or(page.locator('text=Verification failed'))).toBeVisible();
   });
+
+  test('dashboard redirects unauthenticated user to login', async ({ page }) => {
+    await page.goto('/dashboard');
+    
+    // Unauthenticated user should be redirected to login
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.locator('text=Sign in')).toBeVisible();
+  });
 });
