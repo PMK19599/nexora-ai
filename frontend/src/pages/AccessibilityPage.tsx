@@ -201,10 +201,16 @@ export default function AccessibilityPage() {
             {s.ttsEnabled && (
               <>
                 <div className="space-y-2">
-                  <Label className="font-semibold">Voice Speed</Label>
+                  <Label htmlFor="tts-speed" className="font-semibold">Voice Speed</Label>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground">Slow</span>
-                    <input type="range" min="0.5" max="2" step="0.1" value={s.ttsSpeed}
+                    <input
+                      id="tts-speed"
+                      type="range"
+                      min="0.5"
+                      max="2"
+                      step="0.1"
+                      value={s.ttsSpeed}
                       onChange={e => up({ ttsSpeed: parseFloat(e.target.value) })}
                       className="flex-1 accent-teal-600 h-2" />
                     <span className="text-xs text-muted-foreground">Fast</span>
