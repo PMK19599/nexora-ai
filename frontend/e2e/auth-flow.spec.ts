@@ -66,4 +66,24 @@ test.describe('Auth Flow Routes', () => {
     await expect(page).toHaveURL(/\/login/);
     await expect(page.locator('text=Sign in')).toBeVisible();
   });
+
+  test('registration redirects to onboarding instead of verify-pending', async ({ page }) => {
+    await page.route('**/api/auth/register', route => {
+      route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, user: { id: '1', name: 'Test', email: 'test@example.com', isEmailVerified: false, onboardingComplete: false } })
+      });
+    });
+
+    await page.goto('/register');
+    await page.fill('input[name="name"]', 'Test User');
+    await page.fill('input[name="email"]', 'test@example.com');
+    await page.fill('input[name="password"]', 'Password123!');
+    await page.fill('input[name="confirmPassword"]', 'Password123!');
+    await page.click('button:has-text("Continue")');
+    await page.click('button[type="submit"]');
+
+    await expect(page).toHaveURL(/\/onboarding/);
+  });
 });
