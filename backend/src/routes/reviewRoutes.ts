@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { logAttempt, getQueue, getPrediction, getStats } from '../controllers/reviewController';
-import { protect, requireVerified } from '../middleware/auth';
+import { protect } from '../middleware/auth';
 import { validate, reviewLogSchema } from '../middleware/validation';
 const r = Router();
-r.post('/log-attempt', protect, requireVerified, validate(reviewLogSchema), logAttempt);
-r.get('/queue', protect, requireVerified, getQueue);
-r.get('/prediction', protect, requireVerified, getPrediction);
-r.get('/stats', protect, requireVerified, getStats);
+r.post('/log-attempt', protect, validate(reviewLogSchema), logAttempt);
+r.get('/queue', protect, getQueue);
+r.get('/prediction', protect, getPrediction);
+r.get('/stats', protect, getStats);
 export default r;
