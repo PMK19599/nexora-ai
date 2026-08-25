@@ -750,12 +750,12 @@ export default function GamePage() {
             </CardContent>
           </Card>
 
-          {/* ADHD/Dyslexia tip */}
-          {(ndType === 'adhd' || ndType === 'dyslexia') && (
-            <div className={`p-4 rounded-xl border-2 ${ndType === 'adhd' ? 'border-blue-200 bg-blue-50' : 'border-green-200 bg-green-50'}`}>
-              <p className="font-bold text-sm">{ndType === 'adhd' ? '🔵 ADHD Tip' : '🟢 Dyslexia Tip'}</p>
+          {/* Accessibility tip */}
+          {(ndType === 'focus' || ndType === 'reading') && (
+            <div className={`p-4 rounded-xl border-2 ${ndType === 'focus' ? 'border-blue-200 bg-blue-50' : 'border-green-200 bg-green-50'}`}>
+              <p className="font-bold text-sm">{ndType === 'focus' ? '🎯 Focus Tip' : '📖 Reading Tip'}</p>
               <p className="text-sm text-muted-foreground">
-                {ndType === 'adhd'
+                {ndType === 'focus'
                   ? 'Start with 5 questions for quick wins! Short quizzes keep focus high. You earn XP for every game! 🏆'
                   : 'Voice is enabled — each question will be read aloud automatically. Use the 🔊 buttons to replay any text.'}
               </p>

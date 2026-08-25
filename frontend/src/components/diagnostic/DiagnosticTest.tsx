@@ -17,7 +17,7 @@ export default function DiagnosticTest({
   const [latencyLogs, setLatencyLogs] = useState<number[]>([]);
   const [ballPosition, setBallPosition] = useState({ x: 10, y: 50 });
   const [detectedADHD, setDetectedADHD] = useState(false);
-  const [chosenPreset, setChosenPreset] = useState<'adhd' | 'autism' | 'dyslexia' | 'none'>('none');
+  const [chosenPreset, setChosenPreset] = useState<'focus' | 'predictable' | 'reading' | 'none'>('none');
   const stepStartTime = useRef<number>(Date.now());
   const store = useAccessibilityStore();
   const { updateProfile } = useAuthStore();
@@ -50,14 +50,14 @@ export default function DiagnosticTest({
         latencyLogs.reduce((a, b) => a + b, 0) / latencyLogs.length;
       if (averageLatency > 1200) {
         setDetectedADHD(true);
-        setChosenPreset('adhd');
-        store.applyPreset('adhd'); // Configure short burst/high gamification defaults
+        setChosenPreset('focus');
+        store.applyPreset('focus'); // Configure short burst/high gamification defaults
       }
       setTestStep(2);
     }
   };
 
-  const handlePresetSelect = (preset: 'adhd' | 'autism' | 'dyslexia' | 'none') => {
+  const handlePresetSelect = (preset: 'focus' | 'predictable' | 'reading' | 'none') => {
     setChosenPreset(preset);
     if (preset === 'none') {
       store.applyPreset('clear');
@@ -127,7 +127,7 @@ export default function DiagnosticTest({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
               type="button"
-              onClick={() => handlePresetSelect(detectedADHD ? 'adhd' : 'none')}
+              onClick={() => handlePresetSelect(detectedADHD ? 'focus' : 'none')}
               className="p-6 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-600 text-left transition-all hover:scale-[1.02] flex flex-col"
             >
               <p className="text-sm font-semibold text-slate-200">Standard Balance</p>
@@ -137,7 +137,7 @@ export default function DiagnosticTest({
             </button>
             <button
               type="button"
-              onClick={() => handlePresetSelect('dyslexia')}
+              onClick={() => handlePresetSelect('reading')}
               className="p-6 rounded-xl border border-teal-900/50 bg-teal-950/10 hover:border-teal-500 text-left transition-all font-dyslexic hover:scale-[1.02] flex flex-col"
             >
               <p className="text-sm font-semibold text-teal-400">High Weight Typeface</p>
@@ -147,7 +147,7 @@ export default function DiagnosticTest({
             </button>
             <button
               type="button"
-              onClick={() => handlePresetSelect('autism')}
+              onClick={() => handlePresetSelect('predictable')}
               className="p-6 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-600 text-left transition-all hover:scale-[1.02] flex flex-col"
             >
               <p className="text-sm font-semibold text-purple-400">

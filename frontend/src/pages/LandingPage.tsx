@@ -36,8 +36,8 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 auth-bg" />
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-teal-200 rounded-full blur-3xl opacity-30 animate-pulse" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-amber-200 rounded-full blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-20 left-1/4 w-96 h-96 bg-teal-200 rounded-full blur-3xl opacity-30 animate-pulse non-essential" />
+        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-amber-200 rounded-full blur-3xl opacity-30 animate-pulse non-essential" style={{ animationDelay: '1s' }} />
         
         <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-36 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 text-teal-700 text-sm font-medium mb-8 border border-teal-200">

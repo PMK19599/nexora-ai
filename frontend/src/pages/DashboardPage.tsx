@@ -19,17 +19,17 @@ const COLORS = ['#0d9488', '#14b8a6', '#8b5cf6', '#a78bfa', '#c4b5fd'];
 
 // Tips and encouragement per neurodivergent type
 const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }> = {
-  adhd: {
-    greeting: "Your ADHD-optimized focus zone is ready!",
+  focus: {
+    greeting: "Your Focus-Friendly dashboard is ready!",
     emoji: "🎯",
     tips: [
-      "💡 Use the Pomodoro timer below — 15 min focus bursts work best for you!",
-      "🎮 Try 'Learn & Play' — games help ADHD brains learn faster",
+      "💡 Use the Pomodoro timer below — 15 min focus bursts work best!",
+      "🎮 Try 'Learn & Play' — games help active minds learn faster",
       "⭐ Earn XP for every activity — collect them all!",
       "🔔 We'll nudge you gently when it's time to review",
     ]
   },
-  autism: {
+  predictable: {
     greeting: "Your structured, predictable dashboard is ready.",
     emoji: "🧩",
     tips: [
@@ -39,12 +39,12 @@ const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }
       "📖 Use 'Spaced Review' for a structured study routine",
     ]
   },
-  dyslexia: {
+  reading: {
     greeting: "Your reading-friendly dashboard is ready!",
     emoji: "📖",
     tips: [
       "🔊 Click any 'Listen' button to hear text read aloud",
-      "🔤 Your OpenDyslexic font is active for easier reading",
+      "🔤 Your reading-friendly font is active for easier reading",
       "📏 Extra line spacing helps you track each line",
       "🎮 Try 'Learn & Play' — quiz games don't require much reading!",
     ]
@@ -101,15 +101,15 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Pomodoro for ADHD */}
-      {ndType === 'adhd' && <PomodoroTimer />}
+      {/* Pomodoro for Focus-Friendly */}
+      {ndType === 'focus' && <PomodoroTimer />}
 
       {/* ===== NEW USER ONBOARDING ===== */}
       {isNewUser && (
         <Card className="border-2 border-dashed border-teal-300 bg-gradient-to-br from-teal-50 to-emerald-50">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <div className="text-5xl animate-float">🚀</div>
+              <div className="text-5xl animate-float non-essential">🚀</div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                   Welcome to Nexora AI! Let's get started
@@ -142,13 +142,14 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* ===== NEURODIVERGENT TIPS ===== */}
+      {/* ===== ACCESSIBILITY TIPS ===== */}
       {ndType !== 'none' && (
-        <Card className={`border-0 shadow-md overflow-hidden ${ndType === 'adhd' ? 'bg-gradient-to-r from-blue-50 to-cyan-50' : ndType === 'autism' ? 'bg-gradient-to-r from-amber-50 to-pink-50' : 'bg-gradient-to-r from-green-50 to-emerald-50'}`}>
+        <Card className={`border-0 shadow-md overflow-hidden ${ndType === 'focus' ? 'bg-gradient-to-r from-blue-50 to-cyan-50' : ndType === 'predictable' ? 'bg-gradient-to-r from-amber-50 to-pink-50' : 'bg-gradient-to-r from-green-50 to-emerald-50'}`}>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-sm flex items-center gap-2">
-                💡 Tips just for you ({ndType.toUpperCase()})
+                💡 Tips just for you
+
                 {ttsEnabled && <SpeakButton text={nd.tips.join('. ')} />}
               </h3>
             </div>
@@ -168,7 +169,7 @@ export default function DashboardPage() {
       {isNewUser && !showDiagnostic && (
         <Card className="border-0 shadow-xl bg-gradient-to-r from-violet-50 to-purple-50 hover:-translate-y-1 transition-transform">
           <CardContent className="p-5 flex flex-col md:flex-row items-center gap-4">
-            <div className="text-4xl animate-blob">🔬</div>
+            <div className="text-4xl animate-blob non-essential">🔬</div>
             <div className="flex-1">
               <h3 className="font-bold text-lg text-violet-900">Diagnostic Learning Assessment</h3>
               <p className="text-sm text-violet-800">

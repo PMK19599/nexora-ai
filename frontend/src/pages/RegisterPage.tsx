@@ -73,17 +73,17 @@ export default function RegisterPage() {
     }
   };
 
-  const ndInfo: Record<string, { emoji: string; color: string; features: string[] }> = {
-    adhd: { emoji: '🔵', color: 'from-blue-500 to-cyan-500', features: ['Focus mode with timer', 'Pomodoro (15 min)', 'Reduced distractions', 'Progress nudges'] },
-    autism: { emoji: '🟣', color: 'from-amber-500 to-pink-500', features: ['Predictable navigation', 'Consistent layouts', 'No animations', 'Structured schedules'] },
-    dyslexia: { emoji: '🟢', color: 'from-green-500 to-emerald-500', features: ['OpenDyslexic font', 'Text-to-speech', 'Wide line spacing', 'High contrast'] },
+  const ndInfo: Record<string, { label: string; emoji: string; color: string; features: string[] }> = {
+    focus: { label: 'Focus-Friendly', emoji: '🎯', color: 'from-blue-500 to-cyan-500', features: ['Focus mode with timer', 'Pomodoro (15 min)', 'Reduced distractions', 'Progress nudges'] },
+    predictable: { label: 'Predictable Layout', emoji: '🧩', color: 'from-amber-500 to-pink-500', features: ['Predictable navigation', 'Consistent layouts', 'No animations', 'Structured schedules'] },
+    reading: { label: 'Reading-Friendly', emoji: '📖', color: 'from-green-500 to-emerald-500', features: ['OpenDyslexic font', 'Text-to-speech', 'Wide line spacing', 'High contrast'] },
   };
 
   return (
     <main id="main-content" className="flex h-screen overflow-hidden auth-bg">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-700">
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 non-essential">
           <div className="absolute top-10 right-10 w-80 h-80 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-10 left-10 w-96 h-96 bg-amber-300 rounded-full blur-3xl" />
         </div>
@@ -196,13 +196,13 @@ export default function RegisterPage() {
                     <Label className="text-sm font-semibold">Which support preset would help you?</Label>
                     <div className="space-y-2">
                       <p className="text-xs text-muted-foreground">You do not need a diagnosis to use these settings.</p>
-                      {(['adhd', 'autism', 'dyslexia'] as const).map(t => (
+                      {(['focus', 'predictable', 'reading'] as const).map(t => (
                         <button key={t} type="button" onClick={() => u('neurodivergentType', t)}
                           className={`w-full p-3 rounded-xl border-2 text-left transition-all ${fd.neurodivergentType === t ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'}`}>
                           <div className="flex items-center gap-3">
                             <span className="text-xl">{ndInfo[t].emoji}</span>
                             <div className="flex-1">
-                              <div className="font-semibold text-sm capitalize">{t}</div>
+                              <div className="font-semibold text-sm">{ndInfo[t].label}</div>
                               <div className="flex flex-wrap gap-1 mt-1">
                                 {ndInfo[t].features.slice(0, 2).map(f => (
                                   <span key={f} className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted">{f}</span>

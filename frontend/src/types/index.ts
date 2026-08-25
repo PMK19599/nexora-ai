@@ -1,6 +1,6 @@
 export type UserRole = 'student' | 'tutor' | 'admin';
 export type LearningTrack = 'normal' | 'neurodivergent';
-export type NeurodivergentType = 'adhd' | 'autism' | 'dyslexia' | 'none';
+export type NeurodivergentType = 'focus' | 'predictable' | 'reading' | 'none';
 export interface AccessibilitySettings { fontSize: 'small'|'medium'|'normal'|'large'|'xlarge'; colorContrast: 'normal'|'high'|'dark'|'light'|'cyberpunk'|'cosmic'; animations: boolean; readingMode: boolean; audioMode: boolean; focusMode: boolean; fontFamily: 'default'|'opendyslexic'|'arial'|'verdana'|'vazirmatn'; lineSpacing: 'normal'|'wide'|'wider'|'extra'; pomodoroEnabled: boolean; pomodoroWork: number; pomodoroBreak: number; reducedDistractions: boolean; predictableNavigation: boolean; ttsEnabled: boolean; ttsSpeed: number; reducedMotion: boolean; highContrast: boolean; }
 export interface User { _id: string; isEmailVerified: boolean; onboardingComplete: boolean; name: string; email: string; role: UserRole; avatar?: string; learningTrack: LearningTrack; neurodivergentType: NeurodivergentType; accessibility: AccessibilitySettings; skills: string[]; interests: string[]; timezone: string; communicationStyle: string; xp: number; level: number; streak: number; unlockedRewards?: string[]; lastActive: string; isOnline: boolean; createdAt: string; }
 export interface Topic { _id: string; title: string; description: string; domain: string; difficulty: string; estimatedHours: number; tags: string[]; }
