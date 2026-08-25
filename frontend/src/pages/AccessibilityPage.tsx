@@ -22,13 +22,13 @@ export default function AccessibilityPage() {
     try { await updateProfile({ accessibility: s }); toast.success('Settings saved!'); } catch { toast.error('Failed to save'); }
   };
 
-  const handleApplyPreset = async (key: 'adhd' | 'autism' | 'dyslexia' | 'none') => {
+  const handleApplyPreset = async (key: 'focus' | 'predictable' | 'reading' | 'none') => {
     applyPreset(key);
     const baseDefaults: AccessibilitySettings = { fontSize: 'normal', colorContrast: 'normal', animations: true, readingMode: false, audioMode: false, focusMode: false, fontFamily: 'default', lineSpacing: 'normal', pomodoroEnabled: false, pomodoroWork: 25, pomodoroBreak: 5, reducedDistractions: false, predictableNavigation: false, ttsEnabled: false, ttsSpeed: 1, reducedMotion: false, highContrast: false };
     const presetsMap: Record<string, Partial<AccessibilitySettings>> = {
-      adhd: { focusMode: true, pomodoroEnabled: true, pomodoroWork: 15, reducedDistractions: true, animations: false, reducedMotion: true },
-      autism: { predictableNavigation: true, animations: false, colorContrast: 'high', reducedDistractions: true, reducedMotion: true, highContrast: true },
-      dyslexia: { fontFamily: 'opendyslexic', lineSpacing: 'extra', ttsEnabled: true, fontSize: 'large', colorContrast: 'high', highContrast: true },
+      focus: { focusMode: true, pomodoroEnabled: true, pomodoroWork: 15, animations: false, reducedMotion: true },
+      predictable: { predictableNavigation: true, animations: false, reducedDistractions: true, reducedMotion: true },
+      reading: { fontFamily: 'opendyslexic', lineSpacing: 'extra', ttsEnabled: true, fontSize: 'large', colorContrast: 'high', highContrast: true },
       none: baseDefaults,
     };
     const updated = { ...baseDefaults, ...presetsMap[key] };
@@ -82,9 +82,9 @@ export default function AccessibilityPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { key: 'adhd' as const, label: '🔵 ADHD', desc: 'Focus mode, Pomodoro, less clutter', color: 'border-blue-300 bg-blue-50 hover:bg-blue-100' },
-              { key: 'autism' as const, label: '🟣 Autism', desc: 'No animations, predictable layout', color: 'border-amber-300 bg-amber-50 hover:bg-amber-100' },
-              { key: 'dyslexia' as const, label: '🟢 Dyslexia', desc: 'Special font, voice, wide spacing', color: 'border-green-300 bg-green-50 hover:bg-green-100' },
+              { key: 'focus' as const, label: '🎯 Focus-Friendly', desc: 'Focus mode, Pomodoro, less clutter', color: 'border-blue-300 bg-blue-50 hover:bg-blue-100' },
+              { key: 'predictable' as const, label: '🧩 Predictable Layout', desc: 'No animations, consistent navigation', color: 'border-amber-300 bg-amber-50 hover:bg-amber-100' },
+              { key: 'reading' as const, label: '📖 Reading-Friendly', desc: 'Special font, voice, wide spacing', color: 'border-green-300 bg-green-50 hover:bg-green-100' },
               { key: 'none' as const, label: '⬜ Default', desc: 'Reset to standard settings', color: 'border-gray-300 bg-gray-50 hover:bg-gray-100' },
             ].map(p => (
               <button key={p.key} onClick={() => handleApplyPreset(p.key)}
@@ -130,7 +130,7 @@ export default function AccessibilityPage() {
                 <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="default">Default (Inter)</SelectItem>
-                  <SelectItem value="opendyslexic">OpenDyslexic (for Dyslexia)</SelectItem>
+                  <SelectItem value="opendyslexic">OpenDyslexic (Reading-Friendly)</SelectItem>
                   <SelectItem value="arial">Arial (clean & simple)</SelectItem>
                   <SelectItem value="verdana">Verdana (wide & readable)</SelectItem>
                   <SelectItem value="vazirmatn">Vazirmatn (clean & structured)</SelectItem>
@@ -250,7 +250,7 @@ export default function AccessibilityPage() {
 
         {/* Pomodoro */}
         <Card className="border-0 shadow-md md:col-span-2">
-          <CardHeader><CardTitle className="text-lg">⏱️ Pomodoro Timer</CardTitle><CardDescription>Short work sessions with breaks — great for ADHD focus</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="text-lg">⏱️ Pomodoro Timer</CardTitle><CardDescription>Short work sessions with breaks — great for Focus-Friendly</CardDescription></CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row items-start gap-6">
               <div className="flex items-center justify-between py-2 w-full md:w-auto">
@@ -268,7 +268,7 @@ export default function AccessibilityPage() {
                     <Input type="number" className="w-20 h-10" min={1} max={30} value={s.pomodoroBreak} onChange={e => up({ pomodoroBreak: parseInt(e.target.value) || 5 })} />
                   </div>
                   <div className="flex items-end">
-                    <p className="text-sm text-muted-foreground pb-2">💡 ADHD recommended: 15 work / 5 break</p>
+                    <p className="text-sm text-muted-foreground pb-2">💡 Focus-Friendly recommended: 15 work / 5 break</p>
                   </div>
                 </div>
               )}

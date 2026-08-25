@@ -70,30 +70,28 @@ describe('accessibilityStore', () => {
   });
 
   describe('applyPreset', () => {
-    it('applies ADHD preset correctly', () => {
-      useAccessibilityStore.getState().applyPreset('adhd');
+    it('applies focus preset correctly', () => {
+      useAccessibilityStore.getState().applyPreset('focus');
       const state = useAccessibilityStore.getState();
       expect(state.focusMode).toBe(true);
       expect(state.reducedMotion).toBe(true);
       expect(state.animations).toBe(false);
       expect(state.pomodoroEnabled).toBe(true);
       expect(state.pomodoroWork).toBe(15);
-      expect(state.reducedDistractions).toBe(true);
+      expect(state.reducedDistractions).toBe(false);
     });
 
-    it('applies Autism preset correctly', () => {
-      useAccessibilityStore.getState().applyPreset('autism');
+    it('applies predictable preset correctly', () => {
+      useAccessibilityStore.getState().applyPreset('predictable');
       const state = useAccessibilityStore.getState();
       expect(state.reducedMotion).toBe(true);
       expect(state.animations).toBe(false);
-      expect(state.highContrast).toBe(true);
-      expect(state.colorContrast).toBe('high');
       expect(state.predictableNavigation).toBe(true);
       expect(state.reducedDistractions).toBe(true);
     });
 
-    it('applies Dyslexia preset correctly', () => {
-      useAccessibilityStore.getState().applyPreset('dyslexia');
+    it('applies reading preset correctly', () => {
+      useAccessibilityStore.getState().applyPreset('reading');
       const state = useAccessibilityStore.getState();
       expect(state.fontFamily).toBe('opendyslexic');
       expect(state.lineSpacing).toBe('extra');
@@ -104,7 +102,7 @@ describe('accessibilityStore', () => {
     });
 
     it('applies clear preset (resets to clean state)', () => {
-      useAccessibilityStore.getState().applyPreset('adhd');
+      useAccessibilityStore.getState().applyPreset('focus');
       useAccessibilityStore.getState().applyPreset('clear');
       const state = useAccessibilityStore.getState();
       expect(state.focusMode).toBe(false);
@@ -113,7 +111,7 @@ describe('accessibilityStore', () => {
     });
 
     it('applies none preset (resets to clean state)', () => {
-      useAccessibilityStore.getState().applyPreset('adhd');
+      useAccessibilityStore.getState().applyPreset('focus');
       useAccessibilityStore.getState().applyPreset('none');
       const state = useAccessibilityStore.getState();
       expect(state.focusMode).toBe(false);

@@ -22,7 +22,7 @@ export interface AccessibilityStore {
 
   updateSettings: (u: Partial<any>) => void;
   resetSettings: () => void;
-  applyPreset: (preset: 'adhd' | 'autism' | 'dyslexia' | 'clear' | 'none') => void;
+  applyPreset: (preset: 'focus' | 'predictable' | 'reading' | 'clear' | 'none') => void;
   settings: any;
 }
 
@@ -78,7 +78,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
           };
 
           switch (preset) {
-            case 'adhd':
+            case 'focus':
               return {
                 ...cleanState,
                 focusMode: true,
@@ -86,19 +86,16 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
                 animations: false,
                 pomodoroEnabled: true,
                 pomodoroWork: 15,
-                reducedDistractions: true,
               };
-            case 'autism':
+            case 'predictable':
               return {
                 ...cleanState,
                 reducedMotion: true,
                 animations: false,
-                highContrast: true,
-                colorContrast: 'high' as const,
                 predictableNavigation: true,
                 reducedDistractions: true,
               };
-            case 'dyslexia':
+            case 'reading':
               return {
                 ...cleanState,
                 fontFamily: 'opendyslexic' as const,
