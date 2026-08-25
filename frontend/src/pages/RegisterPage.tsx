@@ -67,11 +67,7 @@ export default function RegisterPage() {
         applyPreset(fd.neurodivergentType as any);
       }
       toast.success('Welcome to Nexora AI! 🧠✨');
-      if (useAuthStore.getState().user?.isEmailVerified) {
-        nav('/onboarding');
-      } else {
-        nav('/verify-pending');
-      }
+      nav('/onboarding');
     } catch (err: any) {
       toast.error(err.message || 'Registration failed');
     }
