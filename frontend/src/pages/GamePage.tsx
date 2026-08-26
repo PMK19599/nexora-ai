@@ -66,7 +66,7 @@ const getEncouragement = (correct: boolean) => {
 export default function GamePage() {
   const qc = useQueryClient();
   const { user } = useAuthStore();
-  const { settings } = useAccessibilityStore();
+  const settings = useAccessibilityStore();
   const ndType = user?.neurodivergentType || 'none';
   const ttsOn = settings.ttsEnabled;
   const ttsSpeed = settings.ttsSpeed || 1;

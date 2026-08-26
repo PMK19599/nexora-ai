@@ -13,13 +13,17 @@ import DiagnosticTest from '@/components/diagnostic/DiagnosticTest';
 import toast from 'react-hot-toast';
 
 export default function AccessibilityPage() {
-  const { settings: s, updateSettings: up, applyPreset } = useAccessibilityStore();
+  const s = useAccessibilityStore();
+  const up = s.updateSettings;
+  const applyPreset = s.applyPreset;
   const { user, updateProfile } = useAuthStore();
   const { speak, stop, isSpeaking } = useTTS();
   const [showDiagnostic, setShowDiagnostic] = useState(false);
 
   const save = async () => {
-    try { await updateProfile({ accessibility: s }); toast.success('Settings saved!'); } catch { toast.error('Failed to save'); }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { updateSettings, applyPreset, resetSettings, ...settingsOnly } = s;
+    try { await updateProfile({ accessibility: settingsOnly }); toast.success('Settings saved!'); } catch { toast.error('Failed to save'); }
   };
 
   const handleApplyPreset = async (key: 'focus' | 'predictable' | 'reading' | 'none') => {
@@ -82,9 +86,9 @@ export default function AccessibilityPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { key: 'focus' as const, label: '🎯 Focus-Friendly', desc: 'Focus mode, Pomodoro, less clutter', color: 'border-blue-300 bg-blue-50 hover:bg-blue-100' },
-              { key: 'predictable' as const, label: '🧩 Predictable Layout', desc: 'No animations, consistent navigation', color: 'border-amber-300 bg-amber-50 hover:bg-amber-100' },
-              { key: 'reading' as const, label: '📖 Reading-Friendly', desc: 'Special font, voice, wide spacing', color: 'border-green-300 bg-green-50 hover:bg-green-100' },
+              { key: 'focus' as const, label: '🎯 Focus-Friendly', desc: 'For attention & focus needs. Commonly helpful for ADHD.', color: 'border-blue-300 bg-blue-50 hover:bg-blue-100' },
+              { key: 'predictable' as const, label: '🧩 Predictable Layout', desc: 'For predictable, low-motion experiences. Commonly helpful for many autistic users.', color: 'border-amber-300 bg-amber-50 hover:bg-amber-100' },
+              { key: 'reading' as const, label: '📖 Reading-Friendly', desc: 'For reading & text accessibility. Commonly helpful for dyslexia.', color: 'border-green-300 bg-green-50 hover:bg-green-100' },
               { key: 'none' as const, label: '⬜ Default', desc: 'Reset to standard settings', color: 'border-gray-300 bg-gray-50 hover:bg-gray-100' },
             ].map(p => (
               <button key={p.key} onClick={() => handleApplyPreset(p.key)}
@@ -151,9 +155,22 @@ export default function AccessibilityPage() {
               </Select>
             </div>
             {/* Live preview */}
-            <div className="p-4 rounded-xl bg-muted/50 border">
+            <div className={`p-4 rounded-xl bg-muted/50 border transition-all ${
+              [
+                s.fontSize !== 'normal' && s.fontSize !== 'medium' ? `text-size-${s.fontSize} font-size-${s.fontSize}` : '',
+                s.fontFamily !== 'default' ? `font-${s.fontFamily === 'opendyslexic' ? 'dyslexic' : s.fontFamily}` : '',
+                s.lineSpacing !== 'normal' ? `line-spacing-${s.lineSpacing}` : '',
+                s.focusMode ? 'focus-mode' : '',
+                s.readingMode ? 'reading-mode' : '',
+                s.reducedDistractions ? 'reduced-distractions' : '',
+                s.predictableNavigation ? 'predictable-navigation' : '',
+                !s.animations || s.reducedMotion ? 'no-animations' : '',
+                s.colorContrast === 'high' || s.highContrast ? 'high-contrast' : ''
+              ].filter(Boolean).join(' ')
+            }`}>
               <p className="text-xs text-muted-foreground mb-1">📋 Live Preview:</p>
               <p>This is how your text looks with the current settings. The quick brown fox jumps over the lazy dog.</p>
+              {s.reducedDistractions && <span className="non-essential text-xs text-red-500 block mt-2">This decorative text is non-essential. It will fade out in focus mode and disappear in reduced distractions mode.</span>}
             </div>
           </CardContent>
         </Card>

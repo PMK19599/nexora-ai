@@ -110,36 +110,9 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
           }
         }),
 
-      get settings() {
-        const state = get();
-        return {
-          fontSize: state.fontSize,
-          colorContrast: state.colorContrast,
-          animations: state.animations,
-          readingMode: state.readingMode,
-          audioMode: state.audioMode,
-          focusMode: state.focusMode,
-          fontFamily: state.fontFamily,
-          lineSpacing: state.lineSpacing,
-          pomodoroEnabled: state.pomodoroEnabled,
-          pomodoroWork: state.pomodoroWork,
-          pomodoroBreak: state.pomodoroBreak,
-          reducedDistractions: state.reducedDistractions,
-          predictableNavigation: state.predictableNavigation,
-          ttsEnabled: state.ttsEnabled,
-          ttsSpeed: state.ttsSpeed,
-          reducedMotion: state.reducedMotion,
-          highContrast: state.highContrast,
-        };
-      },
     }),
     {
       name: 'nexora-accessibility-cache',
-      partialize: (state) => {
-        // Exclude the getter from serialization to prevent any JSON parsing/stringifying issues
-        const { settings, ...rest } = state;
-        return rest;
-      },
     }
   )
 );

@@ -34,9 +34,9 @@ const sendSession = (user: any, code: number, res: Response) => {
 
 const getDefaults = (type: string) => {
   const base = { fontSize:'medium',colorContrast:'normal',animations:true,readingMode:false,audioMode:false,focusMode:false,fontFamily:'default',lineSpacing:'normal',pomodoroEnabled:false,pomodoroWork:25,pomodoroBreak:5,reducedDistractions:false,predictableNavigation:false,ttsEnabled:false,ttsSpeed:1,reducedMotion:false,highContrast:false };
-  if(type==='adhd')return{...base,focusMode:true,pomodoroEnabled:true,pomodoroWork:15,reducedDistractions:true};
-  if(type==='autism')return{...base,predictableNavigation:true,animations:false,reducedMotion:true,colorContrast:'high',highContrast:true};
-  if(type==='dyslexia')return{...base,fontFamily:'opendyslexic',lineSpacing:'wide',ttsEnabled:true,fontSize:'large'};
+  if(type==='adhd' || type==='focus')return{...base,focusMode:true,pomodoroEnabled:true,pomodoroWork:15,reducedDistractions:true};
+  if(type==='autism' || type==='predictable')return{...base,predictableNavigation:true,animations:false,reducedMotion:true,reducedDistractions:true};
+  if(type==='dyslexia' || type==='reading')return{...base,fontFamily:'opendyslexic',lineSpacing:'extra',ttsEnabled:true,fontSize:'large',colorContrast:'high',highContrast:true};
   return base;
 };
 
