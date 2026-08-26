@@ -23,7 +23,6 @@ export interface AccessibilityStore {
   updateSettings: (u: Partial<any>) => void;
   resetSettings: () => void;
   applyPreset: (preset: 'focus' | 'predictable' | 'reading' | 'clear' | 'none') => void;
-  settings: any;
 }
 
 const defaults = {
