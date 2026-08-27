@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAccessibilityStore } from '@/stores/accessibilityStore';
 
 export function useTTS() {
-  const { settings } = useAccessibilityStore();
+  const settings = useAccessibilityStore();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
 

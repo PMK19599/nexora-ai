@@ -63,7 +63,7 @@ const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const { settings } = useAccessibilityStore();
+  const settings = useAccessibilityStore();
   const { speak, ttsEnabled } = useTTS();
   const [showDiagnostic, setShowDiagnostic] = useState(false);
 

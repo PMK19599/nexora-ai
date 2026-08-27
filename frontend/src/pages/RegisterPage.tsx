@@ -178,7 +178,7 @@ export default function RegisterPage() {
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { v: 'normal', l: 'Standard', i: '📘', d: 'Career & exam focused' },
-                      { v: 'neurodivergent', l: 'Accessible', i: '♿', d: 'ADHD, Autism, Dyslexia' },
+                      { v: 'neurodivergent', l: 'Accessible', i: '♿', d: 'Accessibility & learning support' },
                     ].map(t => (
                       <button key={t.v} type="button" onClick={() => u('learningTrack', t.v)}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${fd.learningTrack === t.v ? 'border-primary bg-primary/5 shadow-md' : 'border-muted hover:border-primary/50'}`}>

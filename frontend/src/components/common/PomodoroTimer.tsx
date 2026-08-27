@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAccessibilityStore } from '@/stores/accessibilityStore';
 
 export default function PomodoroTimer() {
-  const { settings } = useAccessibilityStore();
+  const settings = useAccessibilityStore();
   const wk = settings.pomodoroWork || 25, brk = settings.pomodoroBreak || 5;
   const [left, setLeft] = useState(wk * 60);
   const [run, setRun] = useState(false);

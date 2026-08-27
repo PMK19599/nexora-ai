@@ -38,7 +38,7 @@ const userSchema = new Schema<IUser>({
   role: { type: String, enum: ['student','tutor','admin'], default: 'student' },
   avatar: { type: String, default: '' },
   learningTrack: { type: String, enum: ['normal','neurodivergent'], default: 'normal' },
-  neurodivergentType: { type: String, enum: ['adhd','autism','dyslexia','none'], default: 'none' },
+  neurodivergentType: { type: String, enum: ['adhd','autism','dyslexia','focus','predictable','reading','none'], default: 'none' },
   accessibility: { type: accessibilitySchema, default: () => ({}) },
   skills: [{ type: String }],
   interests: [{ type: String }],
