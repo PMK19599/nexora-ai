@@ -63,7 +63,12 @@ export const registerAsTutor = async (req: AuthRequest, res: Response, next: Nex
 
 export const requestSession = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    res.status(201).json({ success: true, data: await svc.requestSession(req.user!._id.toString(), req.body.tutorId, req.body.subject, req.body.scheduledAt, req.body.duration) });
+    const { tutorId, subject, scheduledAt, duration } = req.body;
+    if (!tutorId || typeof tutorId !== 'string') { res.status(400).json({ success: false, message: 'tutorId is required and must be a string' }); return; }
+    if (!subject || typeof subject !== 'string') { res.status(400).json({ success: false, message: 'subject is required and must be a string' }); return; }
+    if (!scheduledAt || typeof scheduledAt !== 'string') { res.status(400).json({ success: false, message: 'scheduledAt is required and must be a string' }); return; }
+    if (!duration || typeof duration !== 'number') { res.status(400).json({ success: false, message: 'duration is required and must be a number' }); return; }
+    res.status(201).json({ success: true, data: await svc.requestSession(req.user!._id.toString(), tutorId, subject, scheduledAt, duration) });
   } catch (e) { next(e); }
 };
 
