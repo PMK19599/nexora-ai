@@ -27,11 +27,18 @@ test.describe('Verify Route Protection', () => {
     }
   });
 
-  test('Logged in access checks', async ({ page }) => {
-    console.log('Logging in...');
+  test('authenticated user should be able to access protected routes', async ({ page }) => {
+    const testEmail = process.env.TEST_EMAIL;
+    const testPassword = process.env.TEST_PASSWORD;
+    if (!testEmail || !testPassword) {
+      test.skip(true, 'TEST_EMAIL and TEST_PASSWORD environment variables are required for this test.');
+      return;
+    }
+
+    // Login first
     await page.goto(`${URL}/login`);
-    await page.fill('input[type="email"]', 'nexora.beta.test@gmail.com');
-    await page.fill('input[type="password"]', 'vhuewcy6324rt267ygfbcyg3');
+    await page.fill('input[type="email"]', testEmail);
+    await page.fill('input[type="password"]', testPassword);
     await page.click('button[type="submit"]');
 
     // Wait for successful login (dashboard or onboarding)
