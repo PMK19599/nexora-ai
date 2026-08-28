@@ -14,6 +14,8 @@ export const uploadSyllabus = async (req: AuthRequest, res: Response, next: Next
 export const analyze = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { dreamJob, company, skills } = req.body;
+    if (!dreamJob || typeof dreamJob !== 'string') { res.status(400).json({ success: false, message: 'dreamJob is required and must be a string' }); return; }
+    if (!company || typeof company !== 'string') { res.status(400).json({ success: false, message: 'company is required and must be a string' }); return; }
     if (skills?.length) await User.findByIdAndUpdate(req.user!._id, { skills });
     res.status(201).json({ success: true, data: await svc.analyzeCareer(req.user!._id.toString(), dreamJob, company, skills || req.user!.skills || []) });
   } catch (e) { next(e); }

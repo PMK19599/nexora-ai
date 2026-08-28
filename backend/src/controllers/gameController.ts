@@ -285,6 +285,9 @@ export const submitGameSession = async (req: AuthRequest, res: Response, next: N
   try {
     const { gameId, answers, timeTaken } = req.body;
 
+    if (!gameId || typeof gameId !== 'string') { res.status(400).json({ success: false, message: 'gameId is required and must be a string' }); return; }
+    if (!answers || !Array.isArray(answers)) { res.status(400).json({ success: false, message: 'answers is required and must be an array' }); return; }
+
     const game = await Game.findOne({ _id: gameId, $or: [{ userId: req.user!._id }, { isPublic: true }] });
     if (!game) { res.status(404).json({ success: false, message: 'Game not found' }); return; }
 
