@@ -1,5 +1,7 @@
 # Nexora AI
 
+> **Live Demo:** [https://frontend-kappa-fawn-15.vercel.app](https://frontend-kappa-fawn-15.vercel.app)
+
 > **Project status:** Active development. Core remediation is complete; deployment and production verification are still in progress.
 
 AI-powered adaptive learning infrastructure designed for students with
