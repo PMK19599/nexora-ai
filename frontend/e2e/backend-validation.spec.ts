@@ -17,8 +17,13 @@ test.describe('Backend API Validation Constraints', () => {
         data: { name: 'Test User', email, password }
       });
       if (!res.ok()) {
+        const testEmail = process.env.TEST_EMAIL;
+        const testPassword = process.env.TEST_PASSWORD;
+        if (!testEmail || !testPassword) {
+          throw new Error('Fallback authentication failed: TEST_EMAIL and TEST_PASSWORD environment variables are required.');
+        }
         res = await request.post(`${API_URL}/auth/login`, {
-          data: { email: 'nexora.beta.test@gmail.com', password: 'vhuewcy6324rt267ygfbcyg3' }
+          data: { email: testEmail, password: testPassword }
         });
       }
       if (!res.ok()) {
