@@ -66,6 +66,12 @@ MongoDB must be running locally or configured through `MONGODB_URI`.
 
 AI coding assistants were used for implementation support, debugging, auditing, and remediation. Generated changes were reviewed, tested, and accepted by the team before being merged.
 
+## Known Limitations
+
+- Production deployment and third-party service configuration (e.g., email delivery, AI-providers) depend on valid production credentials.
+- Cross-browser, mobile-device, and accessibility testing is an ongoing effort.
+- AI-generated learning content should be reviewed by educators before high-stakes use.
+
 ## My Contribution
 
 - Product direction and feature planning
