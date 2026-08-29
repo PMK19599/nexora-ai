@@ -1,5 +1,7 @@
 # Nexora AI
 
+[![CI/CD](https://github.com/PMK19599/nexora-ai/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PMK19599/nexora-ai/actions/workflows/ci.yml)
+
 > **Live Demo:** [https://frontend-kappa-fawn-15.vercel.app](https://frontend-kappa-fawn-15.vercel.app)
 
 > **Project status:** Beta Release Ready. The application is deployed, secured, and actively tested.
