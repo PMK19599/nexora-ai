@@ -96,10 +96,9 @@ export default function CareerPage() {
           <CardContent className="p-4 flex items-center gap-4">
             <span className="text-3xl animate-pulse">🌟</span>
             <div>
-              <h4 className="font-bold text-violet-950">Personalized Neuro-Inclusive Mode Active</h4>
+              <h4 className="font-bold text-violet-950">Tailored Learning & Project Mode Active</h4>
               <p className="text-xs text-violet-700 mt-1 leading-relaxed">
-                Your career path analyses and roadmaps are tailored for <strong>{user?.neurodivergentType?.toUpperCase()}</strong> learning patterns. 
-                We prioritize highlighting neuro-inclusive companies, roles that match hyper-focus capabilities, and recommend project/portfolio-based interviews over standard whiteboard algorithms.
+                Your career roadmaps prioritize project- and portfolio-based milestones, structured pacing, and practical alternatives to standard abstract interview formats.
               </p>
             </div>
           </CardContent>
@@ -118,7 +117,7 @@ export default function CareerPage() {
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle className="text-lg">What's your dream role?</CardTitle>
-              <CardDescription>We'll analyze exactly what skills, technologies, and preparation you need</CardDescription>
+              <CardDescription>Identify key skills, core technologies, and recommended preparation for your target role</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
@@ -134,7 +133,7 @@ export default function CareerPage() {
               <div className="space-y-2">
                 <Label className="font-semibold">Your Current Skills (comma-separated)</Label>
                 <Input placeholder="e.g. JavaScript, React, Python, SQL — leave empty if beginner" value={sk} onChange={e => setSk(e.target.value)} className="h-12" />
-                <p className="text-xs text-muted-foreground">💡 Be honest — this helps us identify your exact gaps accurately</p>
+                <p className="text-xs text-muted-foreground">💡 List your current skills to help estimate which areas to focus on first</p>
               </div>
               <div className="space-y-2">
                 <Label className="font-semibold">Upload Syllabus / Course Outline (optional)</Label>
@@ -274,7 +273,7 @@ export default function CareerPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-2xl font-bold">{rm.duration}-Month Career Roadmap</h2>
-                      <p className="text-teal-100 text-sm mt-1">Your personalized path to success</p>
+                      <p className="text-teal-100 text-sm mt-1">A structured step-by-step roadmap for your target role</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <SpeakButton text={`Your ${rm.duration} month career roadmap. ${rm.months?.map((m: any) => `Month ${m.month}: ${m.title}. Goals: ${m.goals?.join(', ')}`).join('. ')}`} />
