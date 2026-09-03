@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDate, getInitials, getMasteryColor, getPreferenceLabel } from '../utils/helpers';
-import { normalizePreferenceType } from '../pages/DashboardPage';
+import { formatDate, getInitials, getMasteryColor, getPreferenceLabel, normalizePreferenceType } from '../utils/helpers';
 
 describe('formatDate', () => {
   it('formats a date string', () => {

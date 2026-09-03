@@ -21,3 +21,21 @@ export const getPreferenceLabel = (type?: string): string | null => {
       return null;
   }
 };
+
+export const normalizePreferenceType = (type?: string): 'focus' | 'predictable' | 'reading' | 'none' => {
+  if (!type) return 'none';
+  const normalized = type.toLowerCase().trim();
+  switch (normalized) {
+    case 'adhd':
+    case 'focus':
+      return 'focus';
+    case 'autism':
+    case 'predictable':
+      return 'predictable';
+    case 'dyslexia':
+    case 'reading':
+      return 'reading';
+    default:
+      return 'none';
+  }
+};
