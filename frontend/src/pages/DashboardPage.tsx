@@ -171,13 +171,13 @@ export default function DashboardPage() {
           <CardContent className="p-5 flex flex-col md:flex-row items-center gap-4">
             <div className="text-4xl animate-blob non-essential">🔬</div>
             <div className="flex-1">
-              <h3 className="font-bold text-lg text-violet-900">Diagnostic Learning Assessment</h3>
+              <h3 className="font-bold text-lg text-violet-900">Interface & Accessibility Setup</h3>
               <p className="text-sm text-violet-800">
-                Want to personalize your experience even further? Take a quick 5-minute pre-test so Nexora AI can fine-tune the curriculum, pacing, and UI to perfectly match your cognitive profile!
+                Calibrate your preferred interface layout, font size, and study pacing presets.
               </p>
             </div>
             <Button className="bg-violet-600 hover:bg-violet-700 whitespace-nowrap shadow-lg shadow-violet-500/30" onClick={() => setShowDiagnostic(true)}>
-              Start Assessment ✨
+              Start Setup ✨
             </Button>
           </CardContent>
         </Card>
