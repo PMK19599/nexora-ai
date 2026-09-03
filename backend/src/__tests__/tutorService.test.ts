@@ -1,6 +1,10 @@
 /// <reference types="jest" />
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { calculateMatchScore } from '../services/tutorService';
+import { PeerTutor, User } from '../models';
+import { ensureSampleTutors, getTutors } from '../controllers/tutorController';
 
 describe('calculateMatchScore', () => {
   it('gives 40 points when tutor has matching subject', () => {
@@ -59,3 +63,68 @@ describe('calculateMatchScore', () => {
     expect(Number.isInteger(score)).toBe(true);
   });
 });
+
+describe('Peer Tutors production auto-seeding guard', () => {
+  let mongoServer: MongoMemoryServer;
+  const originalEnv = process.env.NODE_ENV;
+
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri());
+  });
+
+  afterAll(async () => {
+    process.env.NODE_ENV = originalEnv;
+    await mongoose.disconnect();
+    await mongoServer.stop();
+  });
+
+  beforeEach(async () => {
+    await PeerTutor.deleteMany({});
+    await User.deleteMany({});
+  });
+
+  it('production mode does NOT auto-seed sample tutors', async () => {
+    process.env.NODE_ENV = 'production';
+    const testUserId = new mongoose.Types.ObjectId().toString();
+
+    await ensureSampleTutors(testUserId);
+
+    const tutorCount = await PeerTutor.countDocuments();
+    const userCount = await User.countDocuments();
+    expect(tutorCount).toBe(0);
+    expect(userCount).toBe(0);
+  });
+
+  it('production GET /api/tutors returns empty array and creates 0 fabricated records when empty', async () => {
+    process.env.NODE_ENV = 'production';
+    const currentUserId = new mongoose.Types.ObjectId();
+
+    const req: any = {
+      user: { _id: currentUserId },
+      query: {}
+    };
+    let responseData: any = null;
+    const res: any = {
+      json: (data: any) => { responseData = data; }
+    };
+    const next = () => {};
+
+    await getTutors(req, res, next);
+
+    expect(responseData).toEqual({ success: true, data: [] });
+    const count = await PeerTutor.countDocuments();
+    expect(count).toBe(0);
+  });
+
+  it('development/test mode can still seed sample tutors when count is zero', async () => {
+    process.env.NODE_ENV = 'test';
+    const testUserId = new mongoose.Types.ObjectId().toString();
+
+    await ensureSampleTutors(testUserId);
+
+    const tutorCount = await PeerTutor.countDocuments();
+    expect(tutorCount).toBe(5);
+  });
+});
+
