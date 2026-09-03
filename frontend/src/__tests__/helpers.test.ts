@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { formatDate, getInitials, getMasteryColor, getPreferenceLabel } from '../utils/helpers';
+import { normalizePreferenceType } from '../pages/DashboardPage';
 
 describe('formatDate', () => {
   it('formats a date string', () => {
@@ -76,6 +77,36 @@ describe('getPreferenceLabel', () => {
     expect(getPreferenceLabel('')).toBeNull();
     expect(getPreferenceLabel(undefined)).toBeNull();
     expect(getPreferenceLabel('unknown_condition')).toBeNull();
+  });
+});
+
+describe('normalizePreferenceType', () => {
+  it('normalizes legacy adhd to focus', () => {
+    expect(normalizePreferenceType('adhd')).toBe('focus');
+    expect(normalizePreferenceType('ADHD')).toBe('focus');
+  });
+
+  it('normalizes legacy autism to predictable', () => {
+    expect(normalizePreferenceType('autism')).toBe('predictable');
+    expect(normalizePreferenceType('Autism')).toBe('predictable');
+  });
+
+  it('normalizes legacy dyslexia to reading', () => {
+    expect(normalizePreferenceType('dyslexia')).toBe('reading');
+    expect(normalizePreferenceType('DYSLEXIA')).toBe('reading');
+  });
+
+  it('preserves modern functional presets', () => {
+    expect(normalizePreferenceType('focus')).toBe('focus');
+    expect(normalizePreferenceType('predictable')).toBe('predictable');
+    expect(normalizePreferenceType('reading')).toBe('reading');
+  });
+
+  it('maps none, empty, undefined, or unknown values to none', () => {
+    expect(normalizePreferenceType('none')).toBe('none');
+    expect(normalizePreferenceType('')).toBe('none');
+    expect(normalizePreferenceType(undefined)).toBe('none');
+    expect(normalizePreferenceType('unknown_preset')).toBe('none');
   });
 });
 

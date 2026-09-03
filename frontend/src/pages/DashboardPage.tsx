@@ -61,6 +61,24 @@ const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }
   },
 };
 
+export const normalizePreferenceType = (type?: string): 'focus' | 'predictable' | 'reading' | 'none' => {
+  if (!type) return 'none';
+  const normalized = type.toLowerCase().trim();
+  switch (normalized) {
+    case 'adhd':
+    case 'focus':
+      return 'focus';
+    case 'autism':
+    case 'predictable':
+      return 'predictable';
+    case 'dyslexia':
+    case 'reading':
+      return 'reading';
+    default:
+      return 'none';
+  }
+};
+
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const settings = useAccessibilityStore();
@@ -76,7 +94,7 @@ export default function DashboardPage() {
   const bars = (s.topicBreakdown || []).slice(0, 6).map((t: any) => ({ name: t.topic?.substring(0, 12) || 'Topic', mastery: t.mastery || 0, retention: t.retention || 0 }));
   const pie = [{ name: 'Mastered', value: s.masteredTopics }, { name: 'Learning', value: Math.max(0, s.totalTopics - s.masteredTopics - s.dueTopics) }, { name: 'Due', value: s.dueTopics }].filter(d => d.value > 0);
 
-  const ndType = user?.neurodivergentType || 'none';
+  const ndType = normalizePreferenceType(user?.neurodivergentType);
   const nd = ndTips[ndType] || ndTips.none;
   const isNewUser = s.totalTopics === 0 && s.totalReviews === 0;
   const welcomeText = `Welcome back, ${user?.name?.split(' ')[0]}! ${nd.greeting}`;
