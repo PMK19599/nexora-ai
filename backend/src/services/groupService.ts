@@ -15,7 +15,11 @@ export const matchStudyGroups = async (userId: string) => {
   const user = await User.findById(userId);
   if (!user) throw new Error('Not found');
   const candidates = await User.find({ _id: { $ne: new Types.ObjectId(userId) }, role: 'student' }).limit(50);
-  const suggestedUsers = candidates.map(c => ({ id: c._id, name: c.name, skills: c.skills, interests: c.interests, learningTrack: c.learningTrack, neurodivergentType: c.neurodivergentType, compatibilityScore: calculateCompatibility(user, c) })).sort((a, b) => b.compatibilityScore - a.compatibilityScore).slice(0, 10);
+  const suggestedUsers = candidates
+    .filter(c => c._id.toString() !== userId.toString())
+    .map(c => ({ id: c._id, name: c.name, skills: c.skills, interests: c.interests, learningTrack: c.learningTrack, neurodivergentType: c.neurodivergentType, compatibilityScore: calculateCompatibility(user, c) }))
+    .sort((a, b) => b.compatibilityScore - a.compatibilityScore)
+    .slice(0, 10);
   const availableGroups = await StudyGroup.find({ isActive: true, 'members.userId': { $ne: new Types.ObjectId(userId) }, $expr: { $lt: [{ $size: '$members' }, '$maxMembers'] } }).populate('members.userId', 'name email avatar');
   return { suggestedUsers, availableGroups };
 };

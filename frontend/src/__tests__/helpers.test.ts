@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDate, getInitials, getMasteryColor } from '../utils/helpers';
+import { formatDate, getInitials, getMasteryColor, getPreferenceLabel } from '../utils/helpers';
 
 describe('formatDate', () => {
   it('formats a date string', () => {
@@ -51,3 +51,31 @@ describe('getMasteryColor', () => {
     expect(getMasteryColor(49)).toBe('text-red-600');
   });
 });
+
+describe('getPreferenceLabel', () => {
+  it('maps focus and adhd to Focus-Friendly', () => {
+    expect(getPreferenceLabel('focus')).toBe('Focus-Friendly');
+    expect(getPreferenceLabel('adhd')).toBe('Focus-Friendly');
+    expect(getPreferenceLabel('ADHD')).toBe('Focus-Friendly');
+  });
+
+  it('maps predictable and autism to Predictable Layout', () => {
+    expect(getPreferenceLabel('predictable')).toBe('Predictable Layout');
+    expect(getPreferenceLabel('autism')).toBe('Predictable Layout');
+    expect(getPreferenceLabel('AUTISM')).toBe('Predictable Layout');
+  });
+
+  it('maps reading and dyslexia to Reading-Friendly', () => {
+    expect(getPreferenceLabel('reading')).toBe('Reading-Friendly');
+    expect(getPreferenceLabel('dyslexia')).toBe('Reading-Friendly');
+    expect(getPreferenceLabel('DYSLEXIA')).toBe('Reading-Friendly');
+  });
+
+  it('returns null for none, empty, or unknown values to avoid exposing diagnostic info', () => {
+    expect(getPreferenceLabel('none')).toBeNull();
+    expect(getPreferenceLabel('')).toBeNull();
+    expect(getPreferenceLabel(undefined)).toBeNull();
+    expect(getPreferenceLabel('unknown_condition')).toBeNull();
+  });
+});
+
