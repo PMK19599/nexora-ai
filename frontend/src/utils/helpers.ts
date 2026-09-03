@@ -3,3 +3,21 @@ export const getInitials = (n: string) => n.split(' ').map(x => x[0]).join('').t
 export const getMasteryColor = (m: number) => m >= 80 ? 'text-green-600' : m >= 50 ? 'text-yellow-600' : 'text-red-600';
 export const speak = (text: string, speed = 1) => { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text); u.rate = speed; window.speechSynthesis.speak(u); } };
 export const stopSpeaking = () => { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); };
+
+export const getPreferenceLabel = (type?: string): string | null => {
+  if (!type) return null;
+  const normalized = type.toLowerCase().trim();
+  switch (normalized) {
+    case 'focus':
+    case 'adhd':
+      return 'Focus-Friendly';
+    case 'predictable':
+    case 'autism':
+      return 'Predictable Layout';
+    case 'reading':
+    case 'dyslexia':
+      return 'Reading-Friendly';
+    default:
+      return null;
+  }
+};

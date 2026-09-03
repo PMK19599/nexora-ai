@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
 import GroupChat from '@/components/groups/GroupChat';
+import { getPreferenceLabel } from '@/utils/helpers';
 const RI:Record<string,string> = {timekeeper:'⏱️',notetaker:'📝',questionmaster:'❓',presenter:'🎤',member:'👤'};
 export default function GroupsPage() {
   const { user } = useAuthStore(); const qc = useQueryClient();
@@ -23,6 +24,13 @@ export default function GroupsPage() {
   const crM = useMutation({ mutationFn: groupAPI.create, onSuccess: () => { toast.success('Created!'); setShow(false); qc.invalidateQueries({ queryKey: ['myGroups'] }); } });
   const jnM = useMutation({ mutationFn: groupAPI.join, onSuccess: () => { toast.success('Joined!'); qc.invalidateQueries({ queryKey: ['myGroups'] }); qc.invalidateQueries({ queryKey: ['groupMatches'] }); }, onError: (e: any) => toast.error(e.response?.data?.message || 'Failed') });
   const importM = useMutation({ mutationFn: careerAPI.importRoadmap, onSuccess: () => { toast.success('Curriculum imported successfully! You can view it in your Roadmaps.'); qc.invalidateQueries({ queryKey: ['sharedRoadmaps'] }); }, onError: (e: any) => toast.error(e.response?.data?.message || 'Import failed') });
+
+  const currentUserId = user?._id || (user as any)?.id;
+  const suggestedUsers = (matches?.suggestedUsers || []).filter((u: any) => {
+    if (!currentUserId) return true;
+    return u.id?.toString() !== currentUserId.toString() && u._id?.toString() !== currentUserId.toString();
+  });
+
   return (
     <div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="text-3xl font-bold">📚 AI Study Groups</h1><p className="text-muted-foreground">Smart matching by skills, goals & accessibility</p></div><Button onClick={()=>setShow(true)}>+ Create Group</Button></div>
       <Tabs defaultValue="my" className="space-y-4">
@@ -36,11 +44,44 @@ export default function GroupsPage() {
           {(my||[]).length===0?<Card><CardContent className="py-12 text-center text-muted-foreground">No groups yet. Create or join one!</CardContent></Card>:my.map((g:any)=><GroupCard key={g._id} g={g} />)}
         </TabsContent>
         <TabsContent value="discover" className="space-y-4">{(matches?.availableGroups||[]).length===0?<Card><CardContent className="py-12 text-center text-muted-foreground">No groups available. Create your own!</CardContent></Card>:matches.availableGroups.map((g:any)=><Card key={g._id}><CardContent className="flex items-center justify-between pt-6"><div><h3 className="font-semibold">{g.name}</h3><p className="text-sm text-muted-foreground">{g.members?.length}/{g.maxMembers} members</p><div className="flex flex-wrap gap-1 mt-1">{g.skills?.map((s:string)=><Badge key={s} variant="outline" className="text-xs">{s}</Badge>)}</div></div><Button size="sm" onClick={()=>jnM.mutate(g._id)} disabled={jnM.isPending}>Join</Button></CardContent></Card>)}</TabsContent>
-        <TabsContent value="matches" className="space-y-4"><h3 className="text-lg font-semibold">Suggested Partners</h3>{(matches?.suggestedUsers||[]).length===0?<p className="text-muted-foreground">No matches</p>:<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{matches.suggestedUsers.map((u:any)=><Card key={u.id}><CardContent className="pt-6 space-y-2"><div className="flex items-center justify-between"><span className="font-semibold">{u.name}</span><Badge variant={u.compatibilityScore>=70?'success':'outline'}>{u.compatibilityScore}% match</Badge></div><div className="flex flex-wrap gap-1">{u.skills?.map((s:string)=><Badge key={s} variant="secondary" className="text-xs">{s}</Badge>)}</div>{u.learningTrack==='neurodivergent'&&<Badge variant="outline">{u.neurodivergentType}</Badge>}</CardContent></Card>)}</div>}</TabsContent>
+        <TabsContent value="matches" className="space-y-4">
+          <h3 className="text-lg font-semibold">Suggested Partners</h3>
+          {suggestedUsers.length === 0 ? (
+            <p className="text-muted-foreground">No matches</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {suggestedUsers.map((u: any) => {
+                const prefLabel = u.learningPreference || getPreferenceLabel(u.neurodivergentType);
+                return (
+                  <Card key={u.id || u._id}>
+                    <CardContent className="pt-6 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">{u.name}</span>
+                        <Badge variant={u.compatibilityScore >= 70 ? 'success' : 'outline'}>
+                          {u.compatibilityScore}% match
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {u.skills?.map((s: string) => (
+                          <Badge key={s} variant="secondary" className="text-xs">
+                            {s}
+                          </Badge>
+                        ))}
+                      </div>
+                      {prefLabel && (
+                        <Badge variant="outline">{prefLabel}</Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
         <TabsContent value="peer-sharing" className="space-y-4 animate-fade-in-up">
           <div className="flex flex-col gap-1 mb-4">
             <h3 className="text-lg font-bold">🌟 Shared Peer Roadmaps & Curriculums</h3>
-            <p className="text-sm text-muted-foreground">Study plans imported from students with similar profiles ({user?.neurodivergentType?.toUpperCase()})</p>
+            <p className="text-sm text-muted-foreground">Study plans imported from students with similar profiles ({getPreferenceLabel(user?.neurodivergentType) || 'Learning Preferences'})</p>
           </div>
           {(!sharedRoadmaps || sharedRoadmaps.length === 0) ? (
             <Card>
@@ -50,18 +91,22 @@ export default function GroupsPage() {
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {sharedRoadmaps.map((rm: any) => (
-                <Card key={rm._id} className="border-0 shadow-md hover:shadow-xl transition-all stat-card bg-gradient-to-br from-violet-50/50 to-indigo-50/50">
-                  <CardContent className="pt-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-bold text-base text-violet-950">{rm.duration}-Month Study Path</h4>
-                        <p className="text-xs text-violet-600 font-semibold mt-0.5">Created by: {rm.userId?.name || 'Peer'}</p>
+              {sharedRoadmaps.map((rm: any) => {
+                const authorPref = getPreferenceLabel(rm.userId?.neurodivergentType || user?.neurodivergentType);
+                return (
+                  <Card key={rm._id} className="border-0 shadow-md hover:shadow-xl transition-all stat-card bg-gradient-to-br from-violet-50/50 to-indigo-50/50">
+                    <CardContent className="pt-6 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-base text-violet-950">{rm.duration}-Month Study Path</h4>
+                          <p className="text-xs text-violet-600 font-semibold mt-0.5">Created by: {rm.userId?.name || 'Peer'}</p>
+                        </div>
+                        {authorPref && (
+                          <Badge variant="secondary" className="bg-violet-100 text-violet-700">
+                            {authorPref}
+                          </Badge>
+                        )}
                       </div>
-                      <Badge variant="secondary" className="bg-violet-100 text-violet-700">
-                        {rm.userId?.neurodivergentType || user?.neurodivergentType}
-                      </Badge>
-                    </div>
 
                     <div className="space-y-1 bg-white/60 p-3 rounded-lg border border-violet-100 text-xs">
                       <p className="font-bold text-violet-900">Path Outline:</p>
@@ -83,8 +128,9 @@ export default function GroupsPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+              );
+            })}
+          </div>
           )}
         </TabsContent>
       </Tabs>
