@@ -11,13 +11,39 @@ export const calculateCompatibility = (u1: any, u2: any): number => {
   return Math.min(100, s);
 };
 
+export const toNeutralPreference = (type?: string): string | null => {
+  if (!type) return null;
+  const normalized = type.toLowerCase().trim();
+  switch (normalized) {
+    case 'focus':
+    case 'adhd':
+      return 'Focus-Friendly';
+    case 'predictable':
+    case 'autism':
+      return 'Predictable Layout';
+    case 'reading':
+    case 'dyslexia':
+      return 'Reading-Friendly';
+    default:
+      return null;
+  }
+};
+
 export const matchStudyGroups = async (userId: string) => {
   const user = await User.findById(userId);
   if (!user) throw new Error('Not found');
   const candidates = await User.find({ _id: { $ne: new Types.ObjectId(userId) }, role: 'student' }).limit(50);
   const suggestedUsers = candidates
     .filter(c => c._id.toString() !== userId.toString())
-    .map(c => ({ id: c._id, name: c.name, skills: c.skills, interests: c.interests, learningTrack: c.learningTrack, neurodivergentType: c.neurodivergentType, compatibilityScore: calculateCompatibility(user, c) }))
+    .map(c => ({
+      id: c._id,
+      name: c.name,
+      skills: c.skills,
+      interests: c.interests,
+      learningTrack: c.learningTrack,
+      learningPreference: toNeutralPreference(c.neurodivergentType),
+      compatibilityScore: calculateCompatibility(user, c)
+    }))
     .sort((a, b) => b.compatibilityScore - a.compatibilityScore)
     .slice(0, 10);
   const availableGroups = await StudyGroup.find({ isActive: true, 'members.userId': { $ne: new Types.ObjectId(userId) }, $expr: { $lt: [{ $size: '$members' }, '$maxMembers'] } }).populate('members.userId', 'name email avatar');

@@ -51,7 +51,7 @@ export default function GroupsPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {suggestedUsers.map((u: any) => {
-                const prefLabel = getPreferenceLabel(u.neurodivergentType);
+                const prefLabel = u.learningPreference || getPreferenceLabel(u.neurodivergentType);
                 return (
                   <Card key={u.id || u._id}>
                     <CardContent className="pt-6 space-y-2">
