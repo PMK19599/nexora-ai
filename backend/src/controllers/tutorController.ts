@@ -4,8 +4,10 @@ import * as svc from '../services/tutorService';
 import { PeerTutor, PeerSession, User } from '../models';
 import { Types } from 'mongoose';
 
-// Auto-seed sample tutors if none exist
-const ensureSampleTutors = async (currentUserId: string) => {
+// Auto-seed sample tutors if none exist in non-production environments
+export const ensureSampleTutors = async (currentUserId: string) => {
+  if (process.env.NODE_ENV === 'production') return;
+
   const count = await PeerTutor.countDocuments();
   if (count > 0) return;
 
