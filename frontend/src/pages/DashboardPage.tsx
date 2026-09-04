@@ -14,6 +14,7 @@ import { useTTS } from '@/hooks/useTTS';
 import { useState } from 'react';
 import DiagnosticTest from '@/components/diagnostic/DiagnosticTest';
 import toast from 'react-hot-toast';
+import { normalizePreferenceType } from '../utils/helpers';
 
 const COLORS = ['#0d9488', '#14b8a6', '#8b5cf6', '#a78bfa', '#c4b5fd'];
 
@@ -59,24 +60,6 @@ const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }
       "🎮 Try 'Learn & Play' to test your knowledge with games!",
     ]
   },
-};
-
-export const normalizePreferenceType = (type?: string): 'focus' | 'predictable' | 'reading' | 'none' => {
-  if (!type) return 'none';
-  const normalized = type.toLowerCase().trim();
-  switch (normalized) {
-    case 'adhd':
-    case 'focus':
-      return 'focus';
-    case 'autism':
-    case 'predictable':
-      return 'predictable';
-    case 'dyslexia':
-    case 'reading':
-      return 'reading';
-    default:
-      return 'none';
-  }
 };
 
 export default function DashboardPage() {
