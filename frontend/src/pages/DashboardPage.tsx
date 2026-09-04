@@ -24,8 +24,8 @@ const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }
     greeting: "Your Focus-Friendly dashboard is ready!",
     emoji: "🎯",
     tips: [
-      "💡 Use the Pomodoro timer below — 15 min focus bursts work best!",
-      "🎮 Try 'Learn & Play' — games help active minds learn faster",
+      "💡 Use the Pomodoro timer below to pace your study sessions into focused intervals with regular breaks",
+      "🎮 Try 'Learn & Play' — turn your notes into interactive quizzes to reinforce what you learn",
       "⭐ Earn XP for every activity — collect them all!",
       "🔔 We'll nudge you gently when it's time to review",
     ]
@@ -170,7 +170,7 @@ export default function DashboardPage() {
       {isNewUser && !showDiagnostic && (
         <Card className="border-0 shadow-xl bg-gradient-to-r from-violet-50 to-purple-50 hover:-translate-y-1 transition-transform">
           <CardContent className="p-5 flex flex-col md:flex-row items-center gap-4">
-            <div className="text-4xl animate-blob non-essential">🔬</div>
+            <div className="text-4xl animate-blob non-essential">🎨</div>
             <div className="flex-1">
               <h3 className="font-bold text-lg text-violet-900">Interface & Accessibility Setup</h3>
               <p className="text-sm text-violet-800">
@@ -197,7 +197,7 @@ export default function DashboardPage() {
           { label: 'Total Topics', value: s.totalTopics, sub: `${s.masteredTopics} mastered`, icon: '📚', gradient: 'from-teal-500 to-amber-600' },
           { label: 'Avg Retention', value: `${s.avgRetention}%`, sub: 'Memory strength', icon: '🧠', gradient: 'from-blue-500 to-cyan-600' },
           { label: 'Avg Mastery', value: `${s.avgMastery}%`, sub: 'Skill level', icon: '🏆', gradient: 'from-amber-500 to-orange-600' },
-          { label: 'Total Reviews', value: s.totalReviews, sub: s.dueTopics > 0 ? `${s.dueTopics} due now!` : 'All caught up ✓', icon: '🔄', gradient: 'from-green-500 to-emerald-600' },
+          { label: 'Total Reviews', value: s.totalReviews, sub: s.dueTopics > 0 ? `${s.dueTopics} due now!` : s.totalReviews === 0 ? 'No reviews yet' : 'All caught up ✓', icon: '🔄', gradient: 'from-green-500 to-emerald-600' },
         ].map(card => (
           <Card key={card.label} className="stat-card overflow-hidden border-0 shadow-md">
             <CardContent className="p-0">
