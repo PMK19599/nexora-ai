@@ -1,12 +1,56 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../types';
 import { Game, GameSession } from '../models/Game';
-import { User } from '../models';
+import { User, Topic } from '../models';
+import { Types } from 'mongoose';
 import pdfParse from 'pdf-parse';
 import fs from 'fs';
 import { askAI, getEmbedding } from '../utils/ai';
 import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
 import { sliceTextIntoChunks, getRepresentativeChunks } from '../utils/embeddings';
+
+export const resolveUserTopicForQuiz = async (
+  userId: string | Types.ObjectId,
+  rawTitle?: string,
+  explicitTopicId?: string | Types.ObjectId
+): Promise<Types.ObjectId> => {
+  if (explicitTopicId) {
+    if (typeof explicitTopicId === 'string' && Types.ObjectId.isValid(explicitTopicId)) {
+      return new Types.ObjectId(explicitTopicId);
+    }
+    if (explicitTopicId instanceof Types.ObjectId) {
+      return explicitTopicId;
+    }
+  }
+
+  const cleanTitle = (rawTitle || '')
+    .replace(/^(Quiz from PDF:|Quiz:|Quick Quiz:)\s*/gi, '')
+    .trim();
+
+  const topicTitle = (!cleanTitle || cleanTitle.toLowerCase() === 'quick quiz')
+    ? 'Study Notes'
+    : cleanTitle;
+
+  const userTag = `user:${userId.toString()}`;
+  const escapedTitle = topicTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  let topic = await Topic.findOne({
+    title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
+    tags: userTag,
+  });
+
+  if (!topic) {
+    topic = await Topic.create({
+      title: topicTitle,
+      description: `Study notes topic for ${topicTitle}`,
+      domain: 'Notes',
+      difficulty: 'beginner',
+      tags: [userTag, 'notes-generated'],
+    });
+  }
+
+  return topic._id;
+};
 
 async function generateQuestionsWithAI(text: string, count: number = 10, recentAccuracy: number = 70): Promise<any[]> {
   const localFallback = () => ({ questions: generateQuestionsFromText(text, count, recentAccuracy) });
@@ -205,6 +249,8 @@ export const createGameFromPDF = async (req: AuthRequest, res: Response, next: N
       return;
     }
 
+    const topicId = await resolveUserTopicForQuiz(req.user!._id, title, req.body.topicId);
+
     const game = await Game.create({
       userId: req.user!._id,
       title,
@@ -215,7 +261,7 @@ export const createGameFromPDF = async (req: AuthRequest, res: Response, next: N
       syllabusChunks,
       pdfUrl,
       pdfPublicId,
-      topicId: req.body.topicId || undefined,
+      topicId,
       questions,
       gameType: req.body.gameType || 'quiz',
       totalQuestions: questions.length,
@@ -249,13 +295,15 @@ export const createGameFromText = async (req: AuthRequest, res: Response, next: 
       return;
     }
 
+    const topicId = await resolveUserTopicForQuiz(req.user!._id, title, req.body.topicId);
+
     const game = await Game.create({
       userId: req.user!._id,
       title: title || 'Quick Quiz',
       description: `${questions.length} questions from your notes`,
       sourceType: 'text',
       sourceContent: content.substring(0, 5000),
-      topicId: req.body.topicId || undefined,
+      topicId,
       questions,
       gameType: gameType || 'quiz',
       totalQuestions: questions.length,
@@ -402,12 +450,10 @@ export const submitGameSession = async (req: AuthRequest, res: Response, next: N
     // Connect to SM-2 Spaced Repetition Loop
     let topicId = game.topicId;
     if (!topicId) {
-      // Try to match topic dynamically by parsing name keywords
-      const cleanTitle = game.title.replace(/Quiz from PDF:|Quiz:|Quick Quiz:/gi, '').trim();
-      const TopicModel = require('../models/Topic').default || require('../models/Topic');
-      if (TopicModel) {
-        const match = await TopicModel.findOne({ title: { $regex: new RegExp(cleanTitle, 'i') } });
-        if (match) topicId = match._id;
+      topicId = await resolveUserTopicForQuiz(req.user!._id, game.title);
+      if (topicId) {
+        game.topicId = topicId;
+        await game.save();
       }
     }
     if (topicId) {
