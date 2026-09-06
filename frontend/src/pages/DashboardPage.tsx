@@ -17,6 +17,11 @@ import toast from 'react-hot-toast';
 import { normalizePreferenceType } from '../utils/helpers';
 
 const COLORS = ['#0d9488', '#14b8a6', '#8b5cf6', '#a78bfa', '#c4b5fd'];
+const STATUS_COLORS: Record<string, string> = {
+  Learning: '#0d9488',
+  Mastered: '#10b981',
+  Due: '#f59e0b',
+};
 
 // Tips and encouragement per neurodivergent type
 const ndTips: Record<string, { greeting: string; tips: string[]; emoji: string }> = {
@@ -250,10 +255,37 @@ export default function DashboardPage() {
           {pie.length > 0 && (
             <Card className="border-0 shadow-md">
               <CardHeader><CardTitle className="text-lg">🎯 Status</CardTitle></CardHeader>
-              <CardContent className="flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart><Pie data={pie} cx="50%" cy="50%" outerRadius={100} innerRadius={60} label dataKey="value" strokeWidth={0}>{pie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip /></PieChart>
-                </ResponsiveContainer>
+              <CardContent className="flex flex-col items-center justify-center">
+                <div className="relative w-full h-[240px] flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={pie} cx="50%" cy="50%" outerRadius={90} innerRadius={60} dataKey="value" strokeWidth={0}>
+                        {pie.map((entry, i) => (
+                          <Cell key={entry.name} fill={STATUS_COLORS[entry.name] || COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-3xl font-bold">{s.totalTopics}</span>
+                    <span className="text-xs text-muted-foreground font-medium">{s.totalTopics === 1 ? 'Topic' : 'Topics'}</span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-muted-foreground pt-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: STATUS_COLORS.Learning }} />
+                    <span>Learning ({Math.max(0, s.totalTopics - s.masteredTopics - s.dueTopics)})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: STATUS_COLORS.Mastered }} />
+                    <span>Mastered ({s.masteredTopics})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: STATUS_COLORS.Due }} />
+                    <span>Due ({s.dueTopics})</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
